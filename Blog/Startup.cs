@@ -1,4 +1,5 @@
 using Blog.Contracts;
+using Blog.Contracts.IService;
 using Blog.Data;
 using Blog.Models;
 using Blog.Repository;
@@ -39,6 +40,7 @@ namespace Blog
 
             services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
             services.AddScoped<IUserProfileService, UserProfileService>();
+            services.AddScoped<IArticleService, ArticleService>();
             services.AddScoped<EmailService>();
 
             services.AddControllersWithViews();

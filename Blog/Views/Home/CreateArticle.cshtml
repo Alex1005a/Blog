@@ -1,0 +1,19 @@
+﻿@model Blog.Entities.ViewModels.CreateArticleViewModel
+
+<h2>Создание статьи</h2>
+<form method="post" asp-controller="Home" asp-action="CreateArticle">
+    <div asp-validation-summary="ModelOnly"></div>
+    <div>
+        <label asp-for="Title"></label><br />
+        <input asp-for="Title" />
+        <span asp-validation-for="Title"></span>
+    </div>
+    <div>
+        <label asp-for="Body"></label><br />
+        <input asp-for="Body" />
+        <span asp-validation-for="Body"></span>
+    </div>
+    <div>
+        <input type="submit" value="Создать" />
+    </div>
+</form>

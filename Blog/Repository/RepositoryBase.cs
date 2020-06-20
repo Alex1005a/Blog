@@ -20,12 +20,12 @@ namespace Blog.Repository
 
         public IQueryable<T> FindAll()
         {
-            return this.ApplicationDbContext.Set<T>().AsNoTracking();
+            return this.ApplicationDbContext.Set<T>();
         }
 
         public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression)
         {
-            return this.ApplicationDbContext.Set<T>().Where(expression).AsNoTracking();
+            return this.ApplicationDbContext.Set<T>().Where(expression);
         }
 
         public void Create(T entity)
