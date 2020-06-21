@@ -1,10 +1,6 @@
 ﻿using Blog.Models;
-using Microsoft.AspNetCore.Builder;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Blog.Entities.Models
 {
@@ -17,5 +13,11 @@ namespace Blog.Entities.Models
 
         public string UserId { get; set; }
         public virtual User User { get; set; }
+        public virtual ICollection<Vote> Votes { get; set; }
+
+        public Article()
+        {
+            Votes = new List<Vote>();
+        }
     }
 }

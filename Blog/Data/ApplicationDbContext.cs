@@ -19,6 +19,7 @@ namespace Blog.Data
         }
 
         public DbSet<Article> Articles { get; set; }
+        public DbSet<Vote> Votes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -10,6 +10,6 @@ namespace Blog.Contracts.IService
     public interface IArticleService
     {
         Task Create(CreateArticleViewModel model, string userId);
-        Task<Article> GetArticle(int Id);
+        Task<Article> GetArticleById(int Id);
     }
 }

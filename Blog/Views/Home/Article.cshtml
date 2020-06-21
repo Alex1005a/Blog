@@ -6,3 +6,4 @@
 <h3>@Model.Title</h3>
 <a>@Model.Body</a>
 
+@await Html.PartialAsync("GetAssessment", Model.Votes)

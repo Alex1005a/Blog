@@ -27,12 +27,12 @@ namespace Blog.Services
                 UserId = userId
             });
 
-            _repoWrapper.Save();
+            await Task.Run(() => _repoWrapper.Save());
         }
 
-        public async Task<Article> GetArticle(int Id)
+        public async Task<Article> GetArticleById(int Id)
         {
-            return _repoWrapper.Article.FindByCondition(u => u.Id == Id).First();
+            return await Task.Run(() => _repoWrapper.Article.FindByCondition(u => u.Id == Id).First());
         }
     }
 }

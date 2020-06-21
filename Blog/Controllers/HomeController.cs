@@ -44,7 +44,7 @@ namespace Blog.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Article(int id) => View(await _articleService.GetArticle(id));
+        public async Task<IActionResult> Article(int id) => View(await _articleService.GetArticleById(id));
 
         public IActionResult Privacy() => View();
 

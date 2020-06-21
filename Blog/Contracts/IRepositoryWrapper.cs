@@ -10,6 +10,7 @@ namespace Blog.Contracts
     {
         IUserRepository User { get; }
         IArticleRepository Article { get; }
+        IVoteRepository Vote { get; }
         void Save();
     }
 }

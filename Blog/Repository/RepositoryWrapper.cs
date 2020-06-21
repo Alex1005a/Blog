@@ -9,6 +9,7 @@ namespace Blog.Repository
         private readonly ApplicationDbContext _applicationDbContext;
         private IUserRepository _user;
         private IArticleRepository _article;
+        private IVoteRepository _vote;
 
         public IUserRepository User
         {
@@ -33,6 +34,19 @@ namespace Blog.Repository
                 }
 
                 return _article;
+            }
+        }
+
+        public IVoteRepository Vote
+        {
+            get
+            {
+                if (_vote == null)
+                {
+                    _vote = new VoteRepository(_applicationDbContext);
+                }
+
+                return _vote;
             }
         }
 

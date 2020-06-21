@@ -70,7 +70,7 @@ namespace Blog.Services
                         new { userId = user.Id, code },
                         protocol: httpContext.Request.Scheme);
 
-                await _emailService.SendEmailAsync(registerViewModel.Email, "Confirm your account",
+                await _emailService.SendMessageAsync(registerViewModel.Email, "Confirm your account",
                     $"Подтвердите регистрацию, перейдя по ссылке: <a href='{callbackUrl}'>link</a>");
                 return result;
             }

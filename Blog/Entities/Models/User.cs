@@ -8,10 +8,12 @@ namespace Blog.Models
     {
 
         public virtual ICollection<Article> Articles { get; set; }
+        public virtual ICollection<Vote> Votes { get; set; }
 
         public User()
         {
             Articles = new List<Article>();
+            Votes = new List<Vote>();
         }
     }
 }
