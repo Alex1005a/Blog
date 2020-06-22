@@ -2,6 +2,7 @@
 using Blog.Entities.ViewModels;
 using Blog.Models;
 using Blog.ViewModels;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,7 @@ namespace Blog.Services
 
         public async Task<string> Login(LoginViewModel loginViewModel)
         {
-            var user = await _userManager.FindByNameAsync(loginViewModel.Email);
+            var user = await _userManager.FindByEmailAsync(loginViewModel.Email);
             if (user != null)
             {
                 // проверяем, подтвержден ли email
@@ -38,7 +39,8 @@ namespace Blog.Services
                 }
             }
 
-            var result = await _signInManager.PasswordSignInAsync(loginViewModel.Email, loginViewModel.Password, loginViewModel.RememberMe, false);
+            var result = await _signInManager.PasswordSignInAsync(user.UserName, loginViewModel.Password, loginViewModel.RememberMe, false);
+
             if (result.Succeeded)
             {
                 return null;
@@ -102,5 +104,34 @@ namespace Blog.Services
                 return false;
         }
 
+        public AuthenticationProperties ExternalLogin(string provider, string redirectUrl)
+        {
+            
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            return properties;
+        }
+
+        public async Task GetExternalLoginInfoAsync()
+        {
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+
+            var user1 = await _userManager.FindByIdAsync(info.Principal.FindFirstValue(ClaimTypes.NameIdentifier));
+            if(user1 != null)
+            {
+                await _signInManager.SignInAsync(user1, isPersistent: false);
+                return;
+            }
+          
+            var user = new User { Id = info.Principal.FindFirstValue(ClaimTypes.NameIdentifier), UserName = info.Principal.FindFirstValue(ClaimTypes.Name), Email = info.Principal.FindFirstValue(ClaimTypes.Email) };
+            var result = await _userManager.CreateAsync(user);
+            if (result.Succeeded)
+            {
+                result = await _userManager.AddLoginAsync(user, info);
+                if (result.Succeeded)
+                {
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                }
+            }
+        }
     }
 }

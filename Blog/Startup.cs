@@ -34,6 +34,7 @@ namespace Blog
                 opts.Password.RequireLowercase = false; // требуются ли символы в нижнем регистре
                 opts.Password.RequireUppercase = false; // требуются ли символы в верхнем регистре
                 opts.Password.RequireDigit = true; // требуются ли цифры
+                opts.User.AllowedUserNameCharacters = null;
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
@@ -41,7 +42,15 @@ namespace Blog
             services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
             services.AddScoped<IUserProfileService, UserProfileService>();
             services.AddScoped<IArticleService, ArticleService>();
+            services.AddScoped<IVoteSevice, VoteSevice>();
             services.AddScoped<EmailService>();
+
+            services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    options.ClientId = Passwords.ClientId;
+                    options.ClientSecret = Passwords.ClientSecret;
+                });
 
             services.AddControllersWithViews();
         }

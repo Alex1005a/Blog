@@ -7,3 +7,15 @@
 <a>@Model.Body</a>
 
 @await Html.PartialAsync("GetAssessment", Model.Votes)
+
+<form method="post" asp-controller="Home" asp-action="AddVoteForArticle" asp-route-id="@Model.Id" asp-route-voteStatus="@Blog.Entities.Models.VoteStatus.Plus">
+    <div>
+        <input type="submit" value="Плюс" />
+    </div>
+</form>
+
+<form method="post" asp-controller="Home" asp-action="AddVoteForArticle" asp-route-id="@Model.Id" asp-route-voteStatus="@Blog.Entities.Models.VoteStatus.Minus">
+    <div>
+        <input type="submit" value="Минус" />
+    </div>
+</form>

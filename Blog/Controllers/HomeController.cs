@@ -22,13 +22,15 @@ namespace Blog.Controllers
         private readonly IRepositoryWrapper _repoWrapper;
         private readonly IUserProfileService _userProfile;
         private readonly IArticleService _articleService;
+        private readonly IVoteSevice _voteSevice;
 
-        public HomeController(ILogger<HomeController> logger, IRepositoryWrapper repoWrapper, IUserProfileService userProfile, IArticleService articleService)
+        public HomeController(ILogger<HomeController> logger, IRepositoryWrapper repoWrapper, IUserProfileService userProfile, IArticleService articleService, IVoteSevice voteSevice)
         {
             _logger = logger;
             _repoWrapper = repoWrapper;
             _userProfile = userProfile;
             _articleService = articleService;
+            _voteSevice = voteSevice;
         }
 
         public async Task<IActionResult> Index() => View(await _repoWrapper.Article.FindAll().ToListAsync());
@@ -45,6 +47,13 @@ namespace Blog.Controllers
 
         [HttpGet]
         public async Task<IActionResult> Article(int id) => View(await _articleService.GetArticleById(id));
+
+        [HttpPost]
+        public async Task<IActionResult> AddVoteForArticle(int id, VoteStatus voteStatus)
+        {
+            await _voteSevice.AddVoteForArticle(id, voteStatus, await _userProfile.GetUserId(User));
+            return RedirectToAction("Article", new { id });
+        }
 
         public IActionResult Privacy() => View();
 

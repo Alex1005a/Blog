@@ -2,8 +2,11 @@
 using Blog.Entities.ViewModels;
 using Blog.Models;
 using Blog.ViewModels;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Blog.Controllers
@@ -80,7 +83,27 @@ namespace Blog.Controllers
         {
             // удаляем аутентификационные куки
             await _userProfileService.Logout();
+
             return RedirectToAction("Index", "Home");
         }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public IActionResult ExternalLogin(string provider, string returnUrl = null)
+        {
+            // Request a redirect to the external login provider.
+            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
+            return Challenge(_userProfileService.ExternalLogin(provider, redirectUrl), provider);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalLoginCallback()
+        {
+            await _userProfileService.GetExternalLoginInfoAsync();
+            return RedirectToAction("Index", "Home");
+        }
+
     }
 }
