@@ -2,7 +2,6 @@ using Blog.Contracts;
 using Blog.Contracts.IService;
 using Blog.Data;
 using Blog.Models;
-using Blog.Repository;
 using Blog.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -39,7 +38,6 @@ namespace Blog
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
             services.AddScoped<IUserProfileService, UserProfileService>();
             services.AddScoped<IArticleService, ArticleService>();
             services.AddScoped<IVoteSevice, VoteSevice>();

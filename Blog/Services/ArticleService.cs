@@ -1,5 +1,6 @@
 ﻿using Blog.Contracts;
 using Blog.Contracts.IService;
+using Blog.Data;
 using Blog.Entities.Models;
 using Blog.Entities.ViewModels;
 using System;
@@ -11,28 +12,28 @@ namespace Blog.Services
 {
     public class ArticleService : IArticleService
     {
-        private readonly IRepositoryWrapper _repoWrapper;
+        private readonly ApplicationDbContext db;
 
-        public ArticleService(IRepositoryWrapper repoWrapper)
+        public ArticleService(ApplicationDbContext context)
         {
-            _repoWrapper = repoWrapper;
+            db = context;
         }
 
         public async Task Create(CreateArticleViewModel model, string userId)
         {
-            _repoWrapper.Article.Create(new Article
+            db.Articles.Add(new Article
             {
                 Title = model.Title,
                 Body = model.Body,
                 UserId = userId
             });
 
-            await Task.Run(() => _repoWrapper.Save());
+            await db.SaveChangesAsync();
         }
 
         public async Task<Article> GetArticleById(int Id)
         {
-            return await Task.Run(() => _repoWrapper.Article.FindByCondition(u => u.Id == Id).First());
+            return await db.Articles.FindAsync(Id);
         }
     }
 }

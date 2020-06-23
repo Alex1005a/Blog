@@ -12,6 +12,7 @@ using Blog.Entities.Models;
 using Blog.Entities.ViewModels;
 using Blog.Contracts.IService;
 using Microsoft.EntityFrameworkCore;
+using Blog.Data;
 
 namespace Blog.Controllers
 {
@@ -19,21 +20,21 @@ namespace Blog.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IRepositoryWrapper _repoWrapper;
         private readonly IUserProfileService _userProfile;
         private readonly IArticleService _articleService;
         private readonly IVoteSevice _voteSevice;
+        private readonly ApplicationDbContext db;
 
-        public HomeController(ILogger<HomeController> logger, IRepositoryWrapper repoWrapper, IUserProfileService userProfile, IArticleService articleService, IVoteSevice voteSevice)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, IUserProfileService userProfile, IArticleService articleService, IVoteSevice voteSevice)
         {
             _logger = logger;
-            _repoWrapper = repoWrapper;
+            db = context;
             _userProfile = userProfile;
             _articleService = articleService;
             _voteSevice = voteSevice;
         }
 
-        public async Task<IActionResult> Index() => View(await _repoWrapper.Article.FindAll().ToListAsync());
+        public async Task<IActionResult> Index() => View(await db.Articles.ToListAsync());
 
         [HttpGet]
         public IActionResult CreateArticle() => View();
