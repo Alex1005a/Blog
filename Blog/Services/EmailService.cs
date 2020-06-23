@@ -1,4 +1,5 @@
 ﻿using MailKit.Net.Smtp;
+using Microsoft.Extensions.Logging;
 using MimeKit;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,11 @@ namespace Blog.Services
 {
     public class EmailService
     {
+        private readonly ILogger<EmailService> _logger;
+        public EmailService(ILogger<EmailService> logger)
+        {
+            _logger = logger;
+        }
         public async Task SendMessageAsync(string email, string subject, string message)
         {
             var emailMessage = new MimeMessage();
@@ -21,14 +27,14 @@ namespace Blog.Services
                 Text = message
             };
 
-            using (var client = new SmtpClient())
-            {
-                await client.ConnectAsync("smtp.gmail.com", 25, false);
-                await client.AuthenticateAsync("corovavirus777@gmail.com", Passwords.EmailPass);
-                await client.SendAsync(emailMessage);
+            using var client = new SmtpClient();
+            await client.ConnectAsync("smtp.gmail.com", 25, false);
+            await client.AuthenticateAsync("corovavirus777@gmail.com", Passwords.EmailPass);
+            await client.SendAsync(emailMessage);
 
-                await client.DisconnectAsync(true);
-            }
+            _logger.LogInformation($"Sen messege to {email}");
+
+            await client.DisconnectAsync(true);
         }
     }
 }

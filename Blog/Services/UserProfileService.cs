@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,12 +20,14 @@ namespace Blog.Services
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly EmailService _emailService;
+        private readonly ILogger<UserProfileService> _logger;
 
-        public UserProfileService(UserManager<User> userManager, SignInManager<User> signInManager, EmailService emailService)
+        public UserProfileService(UserManager<User> userManager, SignInManager<User> signInManager, EmailService emailService, ILogger<UserProfileService> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailService = emailService;
+            _logger = logger;
         }
 
         public async Task<string> Login(LoginViewModel loginViewModel)
@@ -43,6 +46,7 @@ namespace Blog.Services
 
             if (result.Succeeded)
             {
+                _logger.LogInformation("User login in app");
                 return null;
             }
             else
@@ -54,6 +58,7 @@ namespace Blog.Services
         public async Task Logout()
         {
             await _signInManager.SignOutAsync();
+            _logger.LogInformation("User logout in app");
         }
 
         public async Task<IdentityResult> Register(RegisterViewModel registerViewModel, IUrlHelper Url, HttpContext httpContext)
@@ -61,7 +66,9 @@ namespace Blog.Services
             User user = new User { Email = registerViewModel.Email, UserName = registerViewModel.UserName };
             // добавляем пользователя
             var result = await _userManager.CreateAsync(user, registerViewModel.Password);
-           
+
+            _logger.LogInformation("User add in db");
+
             if (result.Succeeded)
             {
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -88,25 +95,24 @@ namespace Blog.Services
 
         public async Task<bool> ConfirmEmail(string userId, string code)
         {
-            if (userId == null || code == null)
-            {
-                return false;
-            }
+            if (userId == null || code == null) return false;
+
             var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return false;
-            }
+
+            if (user == null) return false;
+
             var result = await _userManager.ConfirmEmailAsync(user, code);
+
             if (result.Succeeded)
+            {
+                _logger.LogInformation("User email confirm");
                 return true;
-            else
-                return false;
+            }               
+            else return false;
         }
 
         public AuthenticationProperties ExternalLogin(string provider, string redirectUrl)
         {
-            
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return properties;
         }
@@ -119,6 +125,7 @@ namespace Blog.Services
             if(user1 != null)
             {
                 await _signInManager.SignInAsync(user1, isPersistent: false);
+                _logger.LogInformation($"User login in app with {info.ProviderDisplayName}");
                 return;
             }
           
@@ -129,6 +136,7 @@ namespace Blog.Services
                 result = await _userManager.AddLoginAsync(user, info);
                 if (result.Succeeded)
                 {
+                    _logger.LogInformation($"New User login in app with {info.ProviderDisplayName}");
                     await _signInManager.SignInAsync(user, isPersistent: false);
                 }
             }

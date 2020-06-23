@@ -32,6 +32,8 @@ namespace Blog.Services
             ));
 
             await db.SaveChangesAsync();
+
+            _logger.LogInformation($"User with Id {userId} create new Article");
         }
 
         public async Task<Article> GetArticleById(int Id)
