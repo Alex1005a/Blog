@@ -26,17 +26,17 @@ namespace Blog.Services
             if(vote == null)
             {
                 db.Votes.Add(new Vote
-                {
-                    Status = voteStatus,
-                    ArticleId = id,
-                    UserId = userId
-                });
+                (
+                    voteStatus,
+                    userId,
+                    id
+                ));
             }
             else
             {
                 if(vote.Status != voteStatus)
                 {
-                    vote.Status = voteStatus;
+                    vote.UpdateStatus(voteStatus);
                 }
             }
 

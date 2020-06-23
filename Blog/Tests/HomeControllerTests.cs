@@ -34,7 +34,7 @@ namespace Blog.Tests
             var model = Assert.IsAssignableFrom<IEnumerable<User>>(viewResult.Model);
             Assert.Equal(GetTestArticles().Count, model.Count());
         }
-        */
+        
         private List<Article> GetTestArticles()
         {
             var Articles = new List<Article>
@@ -46,5 +46,6 @@ namespace Blog.Tests
             };
             return Articles;
         }
+        */
     }
 }

@@ -7,17 +7,27 @@ namespace Blog.Entities.Models
     public class Article
     {
         [Key]
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public string Body { get; set; }
+        public int Id { get; private set; }
+        public string Title { get; private set; }
+        public string Body { get; private set; }
 
-        public string UserId { get; set; }
-        public virtual User User { get; set; }
-        public virtual ICollection<Vote> Votes { get; set; }
+        public string UserId { get; private set; }
+        public virtual User User { get; private set; }
+        public virtual ICollection<Vote> Votes { get; private set; }
 
-        public Article()
+
+        public Article(string title, string body, string userId)
         {
+            Title = title;
+            Body = body;
+            UserId = userId;
             Votes = new List<Vote>();
+        }
+
+        public void UpdateArticle(string title, string body)
+        {
+            Title = title;
+            Body = body;
         }
     }
 }

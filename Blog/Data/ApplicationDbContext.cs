@@ -25,5 +25,6 @@ namespace Blog.Data
         {
             optionsBuilder.UseLazyLoadingProxies();
         }
+
     }
 }

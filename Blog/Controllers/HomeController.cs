@@ -19,15 +19,13 @@ namespace Blog.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly IUserProfileService _userProfile;
         private readonly IArticleService _articleService;
         private readonly IVoteSevice _voteSevice;
         private readonly ApplicationDbContext db;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, IUserProfileService userProfile, IArticleService articleService, IVoteSevice voteSevice)
+        public HomeController(ApplicationDbContext context, IUserProfileService userProfile, IArticleService articleService, IVoteSevice voteSevice)
         {
-            _logger = logger;
             db = context;
             _userProfile = userProfile;
             _articleService = articleService;

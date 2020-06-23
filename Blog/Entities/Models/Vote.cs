@@ -12,12 +12,24 @@ namespace Blog.Entities.Models
     public class Vote
     {
         [Key]
-        public int Id { get; set; }
-        public VoteStatus Status { get; set; }
+        public int Id { get; private set; }
+        public VoteStatus Status { get; private set; }
 
-        public string UserId { get; set; }
-        public virtual User User { get; set; }
-        public int ArticleId { get; set; }
-        public virtual Article Article { get; set; }
+        public string UserId { get; private set; }
+        public virtual User User { get; private set; }
+        public int ArticleId { get; private set; }
+        public virtual Article Article { get; private set; }
+
+        public Vote(VoteStatus status, string userId, int articleId)
+        {
+            Status = status;
+            UserId = userId;
+            ArticleId = articleId;
+        }
+
+        public void UpdateStatus(VoteStatus newStatus)
+        {
+            Status = newStatus;
+        }
     }
 }
