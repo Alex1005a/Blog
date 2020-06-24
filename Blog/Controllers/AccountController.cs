@@ -1,12 +1,8 @@
 ﻿using Blog.Contracts;
 using Blog.Entities.ViewModels;
-using Blog.Models;
 using Blog.ViewModels;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Blog.Controllers

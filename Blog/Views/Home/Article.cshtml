@@ -6,16 +6,58 @@
 <h3>@Model.Title</h3>
 <a>@Model.Body</a>
 
-@await Html.PartialAsync("GetAssessment", Model.Votes)
+<div id="ass">@await Html.PartialAsync("GetAssessment", Model.Votes)</div>
 
-<form method="post" asp-controller="Home" asp-action="AddVoteForArticle" asp-route-id="@Model.Id" asp-route-voteStatus="@Blog.Entities.Models.VoteStatus.Plus">
+<form id="plus" method="post" asp-controller="Home" asp-action="AddVoteForArticle" asp-route-id="@Model.Id" asp-route-voteStatus="@Blog.Entities.Models.VoteStatus.Plus">
     <div>
         <input type="submit" value="Плюс" />
     </div>
 </form>
 
-<form method="post" asp-controller="Home" asp-action="AddVoteForArticle" asp-route-id="@Model.Id" asp-route-voteStatus="@Blog.Entities.Models.VoteStatus.Minus">
+<form id="minus" method="post" asp-controller="Home" asp-action="AddVoteForArticle" asp-route-id="@Model.Id" asp-route-voteStatus="@Blog.Entities.Models.VoteStatus.Minus">
     <div>
         <input type="submit" value="Минус" />
     </div>
 </form>
+
+
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script>
+    $(document).ready(function () {
+        var data1 = { id: @Model.Id, voteStatus: 'Minus' };
+        var data2 = { id: @Model.Id, voteStatus: 'Plus' };
+        $('#minus').submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: '@Url.Action("AddVoteForArticle", "Home")',
+                data: data1,
+                type: "POST",
+                dataType: 'text',
+                contentType: "application/x-www-form-urlencoded",
+                success: function (data) {
+                    $("#ass").html(data);
+                },
+                error: function (passParams) {
+                    alert("Error is " + passParams.statusText);
+                }
+            });
+        });
+        $('#plus').submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: '@Url.Action("AddVoteForArticle", "Home")',
+                data: data2,
+                type: "POST",
+                dataType: 'text',
+                contentType: "application/x-www-form-urlencoded",
+                success: function (data) {
+                    $("#ass").html(data);
+                },
+                error: function (passParams) {
+                    alert("Error is " + passParams.statusText);
+                }
+            });
+        });
+    });
+</script>

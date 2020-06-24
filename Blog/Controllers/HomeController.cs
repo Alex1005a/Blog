@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Blog.Models;
 using Blog.Contracts;
 using Microsoft.AspNetCore.Authorization;
@@ -13,6 +9,7 @@ using Blog.Entities.ViewModels;
 using Blog.Contracts.IService;
 using Microsoft.EntityFrameworkCore;
 using Blog.Data;
+using System.Collections.Generic;
 
 namespace Blog.Controllers
 {
@@ -50,8 +47,9 @@ namespace Blog.Controllers
         [HttpPost]
         public async Task<IActionResult> AddVoteForArticle(int id, VoteStatus voteStatus)
         {
-            await _voteSevice.AddVoteForArticle(id, voteStatus, await _userProfile.GetUserId(User));
-            return RedirectToAction("Article", new { id });
+            var votes = await _voteSevice.AddVoteForArticle(id, voteStatus, await _userProfile.GetUserId(User));
+            //return RedirectToAction("Article", new { id });
+            return PartialView("GetAssessment", votes);
         }
 
         public IActionResult Privacy() => View();

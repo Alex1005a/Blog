@@ -1,9 +1,7 @@
-﻿using Blog.Contracts;
-using Blog.Contracts.IService;
+﻿using Blog.Contracts.IService;
 using Blog.Data;
 using Blog.Entities.Models;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,7 +19,7 @@ namespace Blog.Services
             _logger = logger;
         }
 
-        public async Task AddVoteForArticle(int articleId, VoteStatus voteStatus, string userId)
+        public async Task<IEnumerable<Vote>> AddVoteForArticle(int articleId, VoteStatus voteStatus, string userId)
         {
             Article article = await db.Articles.FindAsync(articleId);
             Vote vote = article.Votes?.FirstOrDefault(u => u.UserId == userId);
@@ -46,6 +44,8 @@ namespace Blog.Services
             }
 
             await db.SaveChangesAsync();
+
+            return article.Votes;
         }
     }
 }

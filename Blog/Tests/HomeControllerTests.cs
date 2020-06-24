@@ -1,19 +1,4 @@
-﻿using Blog.Contracts;
-using Blog.Controllers;
-using Blog.Entities.Models;
-using Blog.Models;
-using Castle.Core.Logging;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Xunit;
-
-namespace Blog.Tests
+﻿namespace Blog.Tests
 {
     public class HomeControllerTests
     {
