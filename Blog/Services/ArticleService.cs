@@ -1,8 +1,13 @@
-﻿using Blog.Contracts.IService;
+﻿using Blog.Contracts.IQuery;
+using Blog.Contracts.IService;
 using Blog.Data;
 using Blog.Entities.Models;
 using Blog.Entities.ViewModels;
+using Blog.Features.Queries.GetArticleById;
+using Castle.DynamicProxy.Generators;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Blog.Services
@@ -11,11 +16,12 @@ namespace Blog.Services
     {
         private readonly ApplicationDbContext db;
         private readonly ILogger<ArticleService> _logger;
-
-        public ArticleService(ApplicationDbContext context, ILogger<ArticleService> logger)
+        private readonly IQueryDispatcher _queryDispatcher;
+        public ArticleService(ApplicationDbContext context, ILogger<ArticleService> logger, IQueryDispatcher queryDispatcher)
         {
             db = context;
             _logger = logger;
+            _queryDispatcher = queryDispatcher;
         }
 
         public async Task Create(CreateArticleViewModel model, string userId)
@@ -35,7 +41,13 @@ namespace Blog.Services
         public async Task<Article> GetArticleById(int Id)
         {
             _logger.LogInformation($"Get Article By Id: {Id}");
-            return await db.Articles.FindAsync(Id);
+            var articleById = new GetArticleById { Id = Id };
+            return await _queryDispatcher.Execute<GetArticleById, Article>(articleById);
+        }
+
+        public async Task<IEnumerable<Article>> GetArticles()
+        {
+            return await db.Articles.ToListAsync();
         }
     }
 }

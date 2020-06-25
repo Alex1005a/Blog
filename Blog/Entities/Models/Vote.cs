@@ -1,4 +1,5 @@
-﻿using Blog.Models;
+﻿using Blog.Contracts.IModel;
+using Blog.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace Blog.Entities.Models

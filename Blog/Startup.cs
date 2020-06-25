@@ -1,6 +1,8 @@
 using Blog.Contracts;
+using Blog.Contracts.IQuery;
 using Blog.Contracts.IService;
 using Blog.Data;
+using Blog.Features.Queries;
 using Blog.Models;
 using Blog.Services;
 using Microsoft.AspNetCore.Builder;
@@ -10,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Linq;
 
 namespace Blog
 {
@@ -38,10 +41,31 @@ namespace Blog
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
+            services.AddSingleton<IDbConnectionFactory>(x => new DbConnectionFactory(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IUserProfileService, UserProfileService>();
             services.AddScoped<IArticleService, ArticleService>();
             services.AddScoped<IVoteSevice, VoteSevice>();
+            services.AddScoped<IQueryDispatcher, QueryDispatcher>();
             services.AddScoped<EmailService>();
+
+            //register queryes
+            var queryHandlers = typeof(Startup).Assembly.GetTypes()
+             .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQueryHandler<,>)));
+
+            foreach (var handler in queryHandlers)
+            {
+                services.AddScoped(handler.GetInterfaces().First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQueryHandler<,>)), handler);
+            }
+
+            //register commands
+            var commandHandlers = typeof(Startup).Assembly.GetTypes()
+             .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommandHandler<>)));
+
+            foreach (var handler in commandHandlers)
+            {
+                services.AddScoped(handler.GetInterfaces().First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommandHandler<>)), handler);
+            }
+
 
             services.AddAuthentication()
                 .AddGoogle(options =>

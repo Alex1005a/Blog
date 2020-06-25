@@ -19,17 +19,15 @@ namespace Blog.Controllers
         private readonly IUserProfileService _userProfile;
         private readonly IArticleService _articleService;
         private readonly IVoteSevice _voteSevice;
-        private readonly ApplicationDbContext db;
 
-        public HomeController(ApplicationDbContext context, IUserProfileService userProfile, IArticleService articleService, IVoteSevice voteSevice)
+        public HomeController(IUserProfileService userProfile, IArticleService articleService, IVoteSevice voteSevice)
         {
-            db = context;
             _userProfile = userProfile;
             _articleService = articleService;
             _voteSevice = voteSevice;
         }
 
-        public async Task<IActionResult> Index() => View(await db.Articles.ToListAsync());
+        public async Task<IActionResult> Index() => View(await _articleService.GetArticles());
 
         [HttpGet]
         public IActionResult CreateArticle() => View();

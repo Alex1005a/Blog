@@ -1,6 +1,9 @@
 ﻿using Blog.Models;
+using Dapper;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Blog.Entities.Models
 {
@@ -14,7 +17,6 @@ namespace Blog.Entities.Models
         public string UserId { get; private set; }
         public virtual User User { get; private set; }
         public virtual ICollection<Vote> Votes { get; private set; }
-
 
         public Article(string title, string body, string userId)
         {

@@ -32,14 +32,14 @@ namespace Blog.Services
                     userId,
                     articleId
                 ));
-                _logger.LogInformation($"User with Id {userId} create vote to article with Id {articleId}");
+                _logger.LogInformation($"User with Id {userId} create vote to article with Id: {articleId}");
             }
             else
             {
                 if(vote.Status != voteStatus)
                 {
                     vote.UpdateStatus(voteStatus);
-                    _logger.LogInformation($"User with Id {userId} update vote with Id{vote.Id}");
+                    _logger.LogInformation($"User with Id {userId} update vote with Id: {vote.Id}");
                 }
             }
 
