@@ -8,7 +8,7 @@ namespace Blog.Contracts.IService
     public interface IArticleService
     {
         Task Create(CreateArticleViewModel model, string userId);
-        Task<Article> GetArticleById(int Id);
+        Task<ArticleViewModel> GetArticleById(int Id);
         Task<IEnumerable<Article>> GetArticles();
     }
 }

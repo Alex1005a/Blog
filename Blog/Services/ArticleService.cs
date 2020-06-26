@@ -38,11 +38,11 @@ namespace Blog.Services
             _logger.LogInformation($"User with Id {userId} create new Article");
         }
 
-        public async Task<Article> GetArticleById(int Id)
+        public async Task<ArticleViewModel> GetArticleById(int Id)
         {
             _logger.LogInformation($"Get Article By Id: {Id}");
-            var articleById = new GetArticleById { Id = Id };
-            return await _queryDispatcher.Execute<GetArticleById, Article>(articleById);
+            var articleById = new GetArticleById(Id);
+            return await _queryDispatcher.Execute<GetArticleById, ArticleViewModel>(articleById);
         }
 
         public async Task<IEnumerable<Article>> GetArticles()

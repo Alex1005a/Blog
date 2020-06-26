@@ -21,6 +21,8 @@ namespace Blog.Entities.Models
         public int ArticleId { get; private set; }
         public virtual Article Article { get; private set; }
 
+        protected Vote() { }
+
         public Vote(VoteStatus status, string userId, int articleId)
         {
             Status = status;

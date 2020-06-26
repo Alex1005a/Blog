@@ -18,6 +18,8 @@ namespace Blog.Entities.Models
         public virtual User User { get; private set; }
         public virtual ICollection<Vote> Votes { get; private set; }
 
+        protected Article() { }
+
         public Article(string title, string body, string userId)
         {
             Title = title;

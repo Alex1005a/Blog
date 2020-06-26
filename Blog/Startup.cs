@@ -1,3 +1,4 @@
+using AutoMapper;
 using Blog.Contracts;
 using Blog.Contracts.IQuery;
 using Blog.Contracts.IService;
@@ -42,6 +43,8 @@ namespace Blog
                 .AddDefaultTokenProviders();
 
             services.AddSingleton<IDbConnectionFactory>(x => new DbConnectionFactory(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddAutoMapper(typeof(Startup));
+            
             services.AddScoped<IUserProfileService, UserProfileService>();
             services.AddScoped<IArticleService, ArticleService>();
             services.AddScoped<IVoteSevice, VoteSevice>();
