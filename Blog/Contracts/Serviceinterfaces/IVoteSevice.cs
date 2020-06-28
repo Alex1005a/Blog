@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 
-namespace Blog.Contracts.IService
+namespace Blog.Contracts.Serviceinterfaces
 {
     public interface IVoteSevice
     {

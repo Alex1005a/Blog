@@ -1,6 +1,8 @@
 ﻿using Blog.Contracts;
+using Blog.Contracts.CommandInterfeces;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Threading.Tasks;
 
 namespace Blog.Features.Commands
 {
@@ -13,7 +15,7 @@ namespace Blog.Features.Commands
             _resolver = resolver;
         }
  
-        public void Execute<TCommand>(TCommand command) where TCommand : ICommand
+        public async Task<CommonResult> Execute<TCommand>(TCommand command) where TCommand : ICommand
         {
             if (command == null) throw new ArgumentNullException("command");
  
@@ -21,7 +23,7 @@ namespace Blog.Features.Commands
  
             if (handler == null) throw new ArgumentNullException("handler");
 
-            handler.Execute(command);
+            return await handler.Execute(command);
         }
     }
 }

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Blog.Contracts
+namespace Blog.Contracts.CommandInterfeces
 {
     public interface ICommandDispatcher
     {
-        void Execute<TCommand>(TCommand command) where TCommand : ICommand;
+        Task<CommonResult> Execute<TCommand>(TCommand command) where TCommand : ICommand;
     }
 }

@@ -1,4 +1,4 @@
-﻿using Blog.Contracts.IService;
+﻿using Blog.Contracts.Serviceinterfaces;
 using Blog.Data;
 using Blog.Entities.Models;
 using Microsoft.Extensions.Logging;

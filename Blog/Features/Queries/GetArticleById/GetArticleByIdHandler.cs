@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Blog.Contracts;
+using Blog.Contracts.Queryinterfaces;
 using Blog.Data;
 using Blog.Entities.Models;
 using Blog.Entities.ViewModels;
@@ -39,7 +40,7 @@ namespace Blog.Features.Queries.GetArticleById
             Articles.First().Votes = conn.Query<Vote>(@$"SELECT * FROM Votes WHERE ArticleId = {query.Id}").ToList();
 
             return Articles.First();
-            //return await db.Articles.FindAsync(query.Id);
+            //return _mapper.Map<ArticleViewModel>(await db.Articles.FindAsync(query.Id)); 
         }
     }
 }

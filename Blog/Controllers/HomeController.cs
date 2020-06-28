@@ -2,14 +2,10 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Blog.Models;
-using Blog.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Blog.Entities.Models;
 using Blog.Entities.ViewModels;
-using Blog.Contracts.IService;
-using Microsoft.EntityFrameworkCore;
-using Blog.Data;
-using System.Collections.Generic;
+using Blog.Contracts.Serviceinterfaces;
 
 namespace Blog.Controllers
 {
@@ -27,7 +23,8 @@ namespace Blog.Controllers
             _voteSevice = voteSevice;
         }
 
-        public async Task<IActionResult> Index() => View(await _articleService.GetArticles());
+        //[Route("Index/page{page:int}")]
+        public async Task<IActionResult> Index(int page = 1) => View(await _articleService.GetArticles(page));
 
         [HttpGet]
         public IActionResult CreateArticle() => View();
@@ -35,8 +32,8 @@ namespace Blog.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateArticle(CreateArticleViewModel model)
         {
-            await _articleService.Create(model, await _userProfile.GetUserId(User));
-            return RedirectToAction("Index");
+            int id = await _articleService.Create(model, await _userProfile.GetUserAsync(User));
+            return RedirectToAction("Article", new { id } );
         }
 
         [HttpGet]

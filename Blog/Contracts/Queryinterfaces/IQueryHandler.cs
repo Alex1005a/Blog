@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Blog.Contracts
+namespace Blog.Contracts.Queryinterfaces
 {
     public interface IQueryHandler<in TQuery, TResult> where TQuery : IQuery<TResult>
     {

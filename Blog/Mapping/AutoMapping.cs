@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Blog.Entities.Models;
 using Blog.Entities.ViewModels;
+using Blog.Features.Commands.CreateArticle;
 
 namespace Blog.Mapping
 {
@@ -9,6 +10,8 @@ namespace Blog.Mapping
         public AutoMapping()
         {
             CreateMap<Article, ArticleViewModel>();
+            CreateMap<CreateArticleViewModel, CreateArticle>();
+            CreateMap<CreateArticle, Article>();
         }
     }
 }

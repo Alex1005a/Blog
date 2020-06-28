@@ -1,8 +1,9 @@
 using AutoMapper;
-using Blog.Contracts;
-using Blog.Contracts.IQuery;
-using Blog.Contracts.IService;
+using Blog.Contracts.CommandInterfeces;
+using Blog.Contracts.Queryinterfaces;
+using Blog.Contracts.Serviceinterfaces;
 using Blog.Data;
+using Blog.Features.Commands;
 using Blog.Features.Queries;
 using Blog.Models;
 using Blog.Services;
@@ -49,6 +50,7 @@ namespace Blog
             services.AddScoped<IArticleService, ArticleService>();
             services.AddScoped<IVoteSevice, VoteSevice>();
             services.AddScoped<IQueryDispatcher, QueryDispatcher>();
+            services.AddScoped<ICommandDispatcher, CommandDispatcher>();
             services.AddScoped<EmailService>();
 
             //register queryes

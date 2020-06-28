@@ -1,4 +1,5 @@
 ﻿using Blog.Contracts;
+using Blog.Contracts.Serviceinterfaces;
 using Blog.Entities.ViewModels;
 using Blog.Models;
 using Blog.ViewModels;
@@ -30,6 +31,7 @@ namespace Blog.Services
         public async Task<string> Login(LoginViewModel loginViewModel)
         {
             var user = await _userManager.FindByEmailAsync(loginViewModel.Email);
+
             if (user != null)
             {
                 // проверяем, подтвержден ли email
@@ -88,6 +90,11 @@ namespace Blog.Services
         {
             var user1 = await _userManager.GetUserAsync(user);
             return await _userManager.GetUserIdAsync(user1);
+        }
+
+        public async Task<User> GetUserAsync(ClaimsPrincipal user)
+        {
+            return await _userManager.GetUserAsync(user);
         }
 
         public async Task<bool> ConfirmEmail(string userId, string code)

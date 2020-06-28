@@ -1,4 +1,5 @@
-﻿using Blog.Contracts;
+﻿using Blog.Contracts.CommandInterfeces;
+using Blog.Models;
 
 namespace Blog.Features.Commands.CreateArticle
 {
@@ -6,6 +7,6 @@ namespace Blog.Features.Commands.CreateArticle
     {
         public string Title { get; set; }
         public string Body { get; set; }
-        public string UserId { get; set; }
+        public User User { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Blog.Contracts
+﻿namespace Blog.Contracts.CommandInterfeces
 {
     public interface ICommand
     {

@@ -1,5 +1,4 @@
-﻿using Blog.Contracts;
-using Blog.Contracts.IQuery;
+﻿using Blog.Contracts.Queryinterfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;

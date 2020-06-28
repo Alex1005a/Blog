@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Blog.Entities.Models.Article>
+﻿@model Blog.Entities.ViewModels.IndexViewModel
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -9,11 +9,30 @@
 </div>
 
 <div>
-    @foreach(var article in Model)
+    @foreach (var article in Model.Articles)
     {
-    <a asp-action="Article" asp-route-id="@article.Id">@article.Title</a>
+        <a asp-action="Article" asp-route-id="@article.Id">@article.Title</a><br />
     }
 </div>
+
+@if (Model.PageViewModel.HasPreviousPage)
+{
+    <a asp-action="Index"
+       asp-route-page="@(Model.PageViewModel.PageNumber - 1)"
+       class="btn btn-outline-dark">
+        <i class="glyphicon glyphicon-chevron-left"></i>
+        Назад
+    </a>
+}
+@if (Model.PageViewModel.HasNextPage)
+{
+    <a asp-action="Index"
+       asp-route-page="@(Model.PageViewModel.PageNumber + 1)"
+       class="btn btn-outline-dark">
+        Вперед
+        <i class="glyphicon glyphicon-chevron-right"></i>
+    </a>
+}
 
 <form method="post" asp-controller="Account" asp-action="Logout">
     <input type="submit" value="Выход" />

@@ -1,41 +1,40 @@
-﻿using Blog.Contracts.IQuery;
-using Blog.Contracts.IService;
-using Blog.Data;
-using Blog.Entities.Models;
+﻿using AutoMapper;
+using Blog.Contracts.CommandInterfeces;
+using Blog.Contracts.Queryinterfaces;
+using Blog.Contracts.Serviceinterfaces;
 using Blog.Entities.ViewModels;
+using Blog.Features.Commands.CreateArticle;
 using Blog.Features.Queries.GetArticleById;
-using Castle.DynamicProxy.Generators;
-using Microsoft.EntityFrameworkCore;
+using Blog.Features.Queries.GetPageArticles;
+using Blog.Models;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Blog.Services
 {
     public class ArticleService : IArticleService
     {
-        private readonly ApplicationDbContext db;
         private readonly ILogger<ArticleService> _logger;
         private readonly IQueryDispatcher _queryDispatcher;
-        public ArticleService(ApplicationDbContext context, ILogger<ArticleService> logger, IQueryDispatcher queryDispatcher)
+        private readonly ICommandDispatcher _commandDispatcher;
+        private readonly IMapper _mapper;
+        public ArticleService(ILogger<ArticleService> logger, IQueryDispatcher queryDispatcher, ICommandDispatcher commandDispatcher, IMapper mapper)
         {
-            db = context;
             _logger = logger;
             _queryDispatcher = queryDispatcher;
+            _commandDispatcher = commandDispatcher;
+            _mapper = mapper;
         }
 
-        public async Task Create(CreateArticleViewModel model, string userId)
+        public async Task<int> Create(CreateArticleViewModel model, User user)
         {
-            db.Articles.Add(new Article
-            (
-                model.Title,
-                model.Body,
-                userId
-            ));
+            var createArticle = _mapper.Map<CreateArticle>(model);
+            createArticle.User = user;
+            var result = await Task.Run(() => _commandDispatcher.Execute(createArticle));
 
-            await db.SaveChangesAsync();
+            _logger.LogInformation($"User with Id {user.Id} create new Article Id: {result.TotalResults}");
 
-            _logger.LogInformation($"User with Id {userId} create new Article");
+            return result.TotalResults;
         }
 
         public async Task<ArticleViewModel> GetArticleById(int Id)
@@ -45,9 +44,9 @@ namespace Blog.Services
             return await _queryDispatcher.Execute<GetArticleById, ArticleViewModel>(articleById);
         }
 
-        public async Task<IEnumerable<Article>> GetArticles()
+        public async Task<IndexViewModel> GetArticles(int page)
         {
-            return await db.Articles.ToListAsync();
+            return await _queryDispatcher.Execute<GetPageArticles, IndexViewModel>(new GetPageArticles(page));
         }
     }
 }
