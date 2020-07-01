@@ -2,24 +2,27 @@
 using Blog.Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Blog.Models
 {
     public class User : IdentityUser
     {
+        private HashSet<Article> _articles;
+        private HashSet<Vote> _votes;
 
-        public virtual ICollection<Article> Articles { get; private set; }
-        public virtual ICollection<Vote> Votes { get; private set; }
+        public virtual IEnumerable<Article> Articles => _articles?.ToList();
+        public virtual IEnumerable<Vote> Votes => _votes?.ToList();
 
         public User()
         {
-            Articles = new List<Article>();
-            Votes = new List<Vote>();
+            _articles = new HashSet<Article>();
+            _votes = new HashSet<Vote>();
         }
 
         public void AddArticle(Article article, ApplicationDbContext db)
         {
-            Articles.Add(article);
+            _articles.Add(article);
             db.SaveChanges();
         }
     }

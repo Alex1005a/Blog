@@ -40,8 +40,8 @@ namespace Blog.Services
         public async Task<ArticleViewModel> GetArticleById(int Id)
         {
             _logger.LogInformation($"Get Article By Id: {Id}");
-            var articleById = new GetArticleById(Id);
-            return await _queryDispatcher.Execute<GetArticleById, ArticleViewModel>(articleById);
+            var articleById = new GetViewArticleById(Id);
+            return await _queryDispatcher.Execute<GetViewArticleById, ArticleViewModel>(articleById);
         }
 
         public async Task<IndexViewModel> GetArticles(int page)

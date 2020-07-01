@@ -7,6 +7,7 @@ using Blog.Features.Commands;
 using Blog.Features.Queries;
 using Blog.Models;
 using Blog.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -14,7 +15,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json.Linq;
 using System.Linq;
+using System.Security.Claims;
 
 namespace Blog
 {
@@ -73,10 +76,32 @@ namespace Blog
 
 
             services.AddAuthentication()
+                .AddCookie()
+                .AddVkontakte(options =>
+                {
+                    options.ClientId = Passwords.VkClientId;
+                    options.ClientSecret = Passwords.VkClientSecret;
+                    options.Events.OnCreatingTicket = (context) =>
+                    {
+                        JObject json = JObject.Parse(context.User.ToString());
+                        context.Identity.AddClaim(new Claim(ClaimTypes.Name, json["first_name"] + " " + json["last_name"]));
+                        context.Identity.AddClaim(new Claim("image", json["photo"].ToString()));
+
+                        return System.Threading.Tasks.Task.CompletedTask;
+                    };
+                })
                 .AddGoogle(options =>
                 {
                     options.ClientId = Passwords.ClientId;
                     options.ClientSecret = Passwords.ClientSecret;
+                    options.Scope.Add("profile");
+                    options.Events.OnCreatingTicket = (context) =>
+                    {
+                        JObject json = JObject.Parse(context.User.ToString());
+                        context.Identity.AddClaim(new Claim("image", json["picture"].ToString()));
+
+                        return System.Threading.Tasks.Task.CompletedTask;
+                    };
                 });
 
             services.AddControllersWithViews();

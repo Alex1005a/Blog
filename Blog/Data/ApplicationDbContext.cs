@@ -20,6 +20,24 @@ namespace Blog.Data
         {
             optionsBuilder.UseLazyLoadingProxies();
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Article>()
+               .Metadata
+               .FindNavigation(nameof(Article.Votes))
+               .SetPropertyAccessMode(PropertyAccessMode.Field);
+
+            modelBuilder.Entity<User>()
+               .Metadata
+               .FindNavigation(nameof(User.Votes))
+               .SetPropertyAccessMode(PropertyAccessMode.Field);
+
+            modelBuilder.Entity<User>()
+              .Metadata
+              .FindNavigation(nameof(User.Articles))
+              .SetPropertyAccessMode(PropertyAccessMode.Field);
+        }
     }
 }

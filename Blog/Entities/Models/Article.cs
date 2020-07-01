@@ -1,4 +1,5 @@
-﻿using Blog.Models;
+﻿using Blog.Data;
+using Blog.Models;
 using Dapper;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,6 +10,8 @@ namespace Blog.Entities.Models
 {
     public class Article
     {
+        private HashSet<Vote> _votes;
+
         [Key]
         public int Id { get; private set; }
         public string Title { get; private set; }
@@ -16,7 +19,7 @@ namespace Blog.Entities.Models
 
         public string UserId { get; private set; }
         public virtual User User { get; private set; }
-        public virtual ICollection<Vote> Votes { get; private set; }
+        public virtual IEnumerable<Vote> Votes => _votes?.ToList();
 
         protected Article() { }
 
@@ -25,13 +28,24 @@ namespace Blog.Entities.Models
             Title = title;
             Body = body;
             UserId = userId;
-            Votes = new List<Vote>();
+            _votes = new HashSet<Vote>();
         }
 
         public void UpdateArticle(string title, string body)
         {
             Title = title;
             Body = body;
+        }
+
+        public void AddVote(Vote vote, ApplicationDbContext db)
+        {
+            var Vote = Votes.FirstOrDefault(u => u.UserId == vote.UserId);
+            if (Vote == null)
+            {
+                _votes.Add(vote);
+            }
+            else Vote.UpdateStatus(vote.Status);
+            db.SaveChanges();
         }
     }
 }

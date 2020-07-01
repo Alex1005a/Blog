@@ -7,6 +7,6 @@ namespace Blog.Contracts.CommandInterfeces
 {
     public interface ICommandDispatcher
     {
-        Task<CommonResult> Execute<TCommand>(TCommand command) where TCommand : ICommand;
+        Task<ICommonResult> Execute<TCommand>(TCommand command) where TCommand : ICommand;
     }
 }

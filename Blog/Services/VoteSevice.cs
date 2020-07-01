@@ -1,6 +1,11 @@
-﻿using Blog.Contracts.Serviceinterfaces;
+﻿using Blog.Contracts.CommandInterfeces;
+using Blog.Contracts.Queryinterfaces;
+using Blog.Contracts.Serviceinterfaces;
 using Blog.Data;
 using Blog.Entities.Models;
+using Blog.Entities.ViewModels;
+using Blog.Features.Commands.AddVote;
+using Blog.Features.Queries.GetArticleById;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,40 +15,29 @@ namespace Blog.Services
 {
     public class VoteSevice : IVoteSevice
     {
-        private readonly ApplicationDbContext db;
         private readonly ILogger<VoteSevice> _logger;
+        private readonly IQueryDispatcher _queryDispatcher;
+        private readonly ICommandDispatcher _commandDispatcher;
 
-        public VoteSevice(ApplicationDbContext context, ILogger<VoteSevice> logger)
+        public VoteSevice(ILogger<VoteSevice> logger, IQueryDispatcher queryDispatcher, ICommandDispatcher commandDispatcher)
         {
-            db = context;
             _logger = logger;
+            _queryDispatcher = queryDispatcher;
+            _commandDispatcher = commandDispatcher;
         }
 
         public async Task<IEnumerable<Vote>> AddVoteForArticle(int articleId, VoteStatus voteStatus, string userId)
         {
-            Article article = await db.Articles.FindAsync(articleId);
-            Vote vote = article.Votes?.FirstOrDefault(u => u.UserId == userId);
-
-            if(vote == null)
-            {
-                db.Votes.Add(new Vote
-                (
-                    voteStatus,
-                    userId,
-                    articleId
-                ));
-                _logger.LogInformation($"User with Id {userId} create vote to article with Id: {articleId}");
-            }
-            else
-            {
-                if(vote.Status != voteStatus)
-                {
-                    vote.UpdateStatus(voteStatus);
-                    _logger.LogInformation($"User with Id {userId} update vote with Id: {vote.Id}");
-                }
-            }
-
-            await db.SaveChangesAsync();
+            Article article = await _queryDispatcher.Execute<GetArticleById, Article>(new GetArticleById(articleId));
+            /*
+            article.AddVote(new Vote
+                            (
+                                voteStatus,
+                                userId,
+                                articleId
+                            ), db);
+            */
+            await _commandDispatcher.Execute(new AddVote(voteStatus, userId, article));
 
             return article.Votes;
         }

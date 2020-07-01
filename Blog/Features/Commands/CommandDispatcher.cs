@@ -15,7 +15,7 @@ namespace Blog.Features.Commands
             _resolver = resolver;
         }
  
-        public async Task<CommonResult> Execute<TCommand>(TCommand command) where TCommand : ICommand
+        public async Task<ICommonResult> Execute<TCommand>(TCommand command) where TCommand : ICommand
         {
             if (command == null) throw new ArgumentNullException("command");
  

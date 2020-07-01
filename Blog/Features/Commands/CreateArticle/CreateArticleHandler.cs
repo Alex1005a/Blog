@@ -15,7 +15,7 @@ namespace Blog.Features.Commands.CreateArticle
             db = context;
             _mapper = mapper;
         }
-        public async Task<CommonResult> Execute(CreateArticle model)
+        public async Task<ICommonResult> Execute(CreateArticle model)
         {
             var article = _mapper.Map<Article>(model);
             await Task.Run(() =>

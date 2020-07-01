@@ -124,11 +124,12 @@ namespace Blog.Services
         public async Task GetExternalLoginInfoAsync()
         {
             var info = await _signInManager.GetExternalLoginInfoAsync();
-
             var user1 = await _userManager.FindByIdAsync(info.Principal.FindFirstValue(ClaimTypes.NameIdentifier));
-            if(user1 != null)
+
+            if (user1 != null)
             {
                 await _signInManager.SignInAsync(user1, isPersistent: false);
+                //info.Principal.FindFirstValue("image");
                 _logger.LogInformation($"User login in app with {info.ProviderDisplayName}");
                 return;
             }
