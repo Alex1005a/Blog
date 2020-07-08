@@ -8,11 +8,11 @@ namespace Blog.Models
 {
     public class User : IdentityUser
     {
-        private HashSet<Article> _articles;
-        private HashSet<Vote> _votes;
+        private readonly HashSet<Article> _articles;
+        private readonly HashSet<Vote> _votes;
 
-        public virtual IEnumerable<Article> Articles => _articles?.ToList();
-        public virtual IEnumerable<Vote> Votes => _votes?.ToList();
+        public virtual IReadOnlyCollection<Article> Articles => _articles?.ToList();
+        public virtual IReadOnlyCollection<Vote> Votes => _votes?.ToList();
 
         public User()
         {

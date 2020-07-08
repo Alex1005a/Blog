@@ -10,7 +10,7 @@ namespace Blog.Entities.Models
 {
     public class Article
     {
-        private HashSet<Vote> _votes;
+        private readonly HashSet<Vote> _votes;
 
         [Key]
         public int Id { get; private set; }
@@ -19,7 +19,7 @@ namespace Blog.Entities.Models
 
         public string UserId { get; private set; }
         public virtual User User { get; private set; }
-        public virtual IEnumerable<Vote> Votes => _votes?.ToList();
+        public virtual IReadOnlyCollection<Vote> Votes => _votes?.ToList();
 
         protected Article() { }
 

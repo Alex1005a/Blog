@@ -32,6 +32,12 @@ namespace Blog
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDistributedRedisCache(option =>
+            {
+                option.Configuration = "127.0.0.1";
+                option.InstanceName = "master";
+            });
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -54,12 +60,11 @@ namespace Blog
             services.AddScoped<IVoteSevice, VoteSevice>();
             services.AddScoped<IQueryDispatcher, QueryDispatcher>();
             services.AddScoped<ICommandDispatcher, CommandDispatcher>();
-            services.AddScoped<EmailService>();
+            services.AddSingleton<EmailService>();
 
             //register queryes
             var queryHandlers = typeof(Startup).Assembly.GetTypes()
              .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQueryHandler<,>)));
-
             foreach (var handler in queryHandlers)
             {
                 services.AddScoped(handler.GetInterfaces().First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQueryHandler<,>)), handler);
@@ -68,7 +73,6 @@ namespace Blog
             //register commands
             var commandHandlers = typeof(Startup).Assembly.GetTypes()
              .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommandHandler<>)));
-
             foreach (var handler in commandHandlers)
             {
                 services.AddScoped(handler.GetInterfaces().First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommandHandler<>)), handler);

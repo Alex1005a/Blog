@@ -7,13 +7,13 @@ namespace Blog.Contracts.CommandInterfeces
 {
     public interface ICommonResult
     {
-        int TotalResults { get; }
+        int? TotalResults { get; }
         string FlashMessage { get; }
         bool Success { get; }
     }
     public class CommonResult : ICommonResult
     {
-        public int TotalResults { get; }
+        public int? TotalResults { get; }
 
         public string FlashMessage { get; }
 

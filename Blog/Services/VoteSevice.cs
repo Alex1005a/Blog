@@ -15,13 +15,11 @@ namespace Blog.Services
 {
     public class VoteSevice : IVoteSevice
     {
-        private readonly ILogger<VoteSevice> _logger;
         private readonly IQueryDispatcher _queryDispatcher;
         private readonly ICommandDispatcher _commandDispatcher;
 
-        public VoteSevice(ILogger<VoteSevice> logger, IQueryDispatcher queryDispatcher, ICommandDispatcher commandDispatcher)
+        public VoteSevice(IQueryDispatcher queryDispatcher, ICommandDispatcher commandDispatcher)
         {
-            _logger = logger;
             _queryDispatcher = queryDispatcher;
             _commandDispatcher = commandDispatcher;
         }
@@ -29,14 +27,7 @@ namespace Blog.Services
         public async Task<IEnumerable<Vote>> AddVoteForArticle(int articleId, VoteStatus voteStatus, string userId)
         {
             Article article = await _queryDispatcher.Execute<GetArticleById, Article>(new GetArticleById(articleId));
-            /*
-            article.AddVote(new Vote
-                            (
-                                voteStatus,
-                                userId,
-                                articleId
-                            ), db);
-            */
+
             await _commandDispatcher.Execute(new AddVote(voteStatus, userId, article));
 
             return article.Votes;

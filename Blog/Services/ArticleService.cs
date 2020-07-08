@@ -34,7 +34,7 @@ namespace Blog.Services
 
             _logger.LogInformation($"User with Id {user.Id} create new Article Id: {result.TotalResults}");
 
-            return result.TotalResults;
+            return result.TotalResults.Value;
         }
 
         public async Task<ArticleViewModel> GetArticleById(int Id)
