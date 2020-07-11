@@ -7,6 +7,8 @@ using Blog.Features.Commands.CreateArticle;
 using Blog.Features.Queries.GetArticleById;
 using Blog.Features.Queries.GetPageArticles;
 using Blog.Models;
+using Ganss.XSS;
+using Markdig;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
@@ -28,8 +30,17 @@ namespace Blog.Services
 
         public async Task<int> Create(CreateArticleViewModel model, User user)
         {
+            var sanitizer = new HtmlSanitizer();
+            sanitizer.AllowedAttributes.Remove("form");
+
+            string html = Markdown.ToHtml(model.Body, new MarkdownPipelineBuilder()
+                                                          .UseAdvancedExtensions()
+                                                          .Build());
+            model.Body = sanitizer.Sanitize(html);
+
             var createArticle = _mapper.Map<CreateArticle>(model);
             createArticle.User = user;
+            
             var result = await Task.Run(() => _commandDispatcher.Execute(createArticle));
 
             _logger.LogInformation($"User with Id {user.Id} create new Article Id: {result.TotalResults}");

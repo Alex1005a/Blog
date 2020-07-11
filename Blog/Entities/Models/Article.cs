@@ -16,7 +16,6 @@ namespace Blog.Entities.Models
         public int Id { get; private set; }
         public string Title { get; private set; }
         public string Body { get; private set; }
-
         public string UserId { get; private set; }
         public virtual User User { get; private set; }
         public virtual IReadOnlyCollection<Vote> Votes => _votes?.ToList();

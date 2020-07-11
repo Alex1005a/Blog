@@ -64,7 +64,7 @@ namespace Blog.Features.Queries.GetPageArticles
                 Articles = articles
             };
 
-            await _distributedCache.AddCache(CacheKey, model);
+            await Task.Run(async() => await _distributedCache.AddCache(CacheKey, model));
 
             return model;
         }

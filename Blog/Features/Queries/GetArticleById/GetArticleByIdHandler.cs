@@ -35,6 +35,7 @@ namespace Blog.Features.Queries.GetArticleById
 
             var sql = @$"select * from Articles 
                          where Id = {query.Id}";
+
             Article Article;
 
             if (CacheValue != null)
@@ -45,13 +46,13 @@ namespace Blog.Features.Queries.GetArticleById
             else
             {
                 Article = (await conn.QueryAsync<Article>(sql)).First();
+                await Task.Run(async () => await _distributedCache.AddCache(CacheKey, Article));
             }
 
             db.Entry(Article).State = EntityState.Unchanged;
             db.Entry(Article).Collection(u => u.Votes).Load();
 
             return Article;
-           
         }
     }
 }

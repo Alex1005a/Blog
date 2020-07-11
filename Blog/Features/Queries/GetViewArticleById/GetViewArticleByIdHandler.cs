@@ -58,7 +58,7 @@ namespace Blog.Features.Queries.GetArticleById
                     })
                     ).First();
 
-                await _distributedCache.AddCache(CacheKey, article);
+                await Task.Run(async() => await _distributedCache.AddCache(CacheKey, article));
             }
 
             article.Votes = conn.Query<Vote>(@$"SELECT * FROM Votes WHERE ArticleId = {query.Id}").ToList();       

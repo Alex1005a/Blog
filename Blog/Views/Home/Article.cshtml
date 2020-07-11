@@ -4,7 +4,8 @@
 
 <a>Автор: @Model.User.UserName</a>
 <h3>@Model.Title</h3>
-<a>@Model.Body</a>
+<!-- <a>@Model.Body</a> -->
+<a>@Html.Raw(Model.Body)</a>
 
 <div id="ass">@await Html.PartialAsync("GetAssessment", Model.Votes)</div>
 

@@ -2,6 +2,8 @@
 using Blog.Contracts.CommandInterfeces;
 using Blog.Data;
 using Blog.Entities.Models;
+using Ganss.XSS;
+using Markdig;
 using System.Threading.Tasks;
 
 namespace Blog.Features.Commands.CreateArticle
@@ -16,8 +18,9 @@ namespace Blog.Features.Commands.CreateArticle
             _mapper = mapper;
         }
         public async Task<ICommonResult> Execute(CreateArticle model)
-        {
-            var article = _mapper.Map<Article>(model);
+        {          
+            var article = _mapper.Map<Article>(model);    
+
             await Task.Run(() =>
                 model.User.AddArticle(article, db)
             );

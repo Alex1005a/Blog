@@ -10,6 +10,7 @@ using Blog.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -122,6 +123,14 @@ namespace Blog
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+            
+            //Nginx
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+            
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
