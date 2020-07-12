@@ -8,6 +8,10 @@
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
 <a class="btn-primary" style="float:right" asp-action="CreateArticle">Создать статью</a>
+<form method="get">
+    <input type="text" name="searchString" />
+    <input type="submit"/>
+</form>
 <div>
     @foreach (var article in Model.Articles)
     {
@@ -19,6 +23,7 @@
 {
     <a asp-action="Index"
        asp-route-page="@(Model.PageViewModel.PageNumber - 1)"
+       asp-route-searchString="@Model.SearchString"
        class="btn btn-outline-dark">
         <i class="glyphicon glyphicon-chevron-left"></i>
         Назад
@@ -28,6 +33,7 @@
 {
     <a asp-action="Index"
        asp-route-page="@(Model.PageViewModel.PageNumber + 1)"
+       asp-route-searchString="@Model.SearchString"
        class="btn btn-outline-dark">
         Вперед
         <i class="glyphicon glyphicon-chevron-right"></i>

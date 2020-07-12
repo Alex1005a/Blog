@@ -24,7 +24,7 @@ namespace Blog.Controllers
         }
 
         //[Route("Index/page{page:int}")]
-        public async Task<IActionResult> Index(int page = 1) => View(await _articleService.GetArticles(page));
+        public async Task<IActionResult> Index(int page = 1, string searchString = null) => View(await _articleService.GetArticles(page, searchString));
 
         [HttpGet]
         public IActionResult CreateArticle() => View();

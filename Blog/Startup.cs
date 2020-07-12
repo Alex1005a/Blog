@@ -3,11 +3,11 @@ using Blog.Contracts.CommandInterfeces;
 using Blog.Contracts.Queryinterfaces;
 using Blog.Contracts.Serviceinterfaces;
 using Blog.Data;
+using Blog.Extensions;
 using Blog.Features.Commands;
 using Blog.Features.Queries;
 using Blog.Models;
 using Blog.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -55,7 +55,9 @@ namespace Blog
 
             services.AddSingleton<IDbConnectionFactory>(x => new DbConnectionFactory(Configuration.GetConnectionString("DefaultConnection")));
             services.AddAutoMapper(typeof(Startup));
-            
+
+            services.AddElasticsearch();
+
             services.AddScoped<IUserProfileService, UserProfileService>();
             services.AddScoped<IArticleService, ArticleService>();
             services.AddScoped<IVoteSevice, VoteSevice>();

@@ -10,6 +10,6 @@ namespace Blog.Contracts.Serviceinterfaces
     {
         Task<int> Create(CreateArticleViewModel model, User user);
         Task<ArticleViewModel> GetArticleById(int Id);
-        Task<IndexViewModel> GetArticles(int page);
+        Task<IndexViewModel> GetArticles(int page, string searchString);
     }
 }

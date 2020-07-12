@@ -55,9 +55,9 @@ namespace Blog.Services
             return await _queryDispatcher.Execute<GetViewArticleById, ArticleViewModel>(articleById);
         }
 
-        public async Task<IndexViewModel> GetArticles(int page)
+        public async Task<IndexViewModel> GetArticles(int page, string searchString)
         {
-            return await _queryDispatcher.Execute<GetPageArticles, IndexViewModel>(new GetPageArticles(page));
+            return await _queryDispatcher.Execute<GetPageArticles, IndexViewModel>(new GetPageArticles(page, searchString));
         }
     }
 }

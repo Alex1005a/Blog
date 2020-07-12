@@ -1,5 +1,6 @@
 ﻿using Blog.Contracts.Serviceinterfaces;
 using Blog.Controllers;
+using Blog.Entities.DTO;
 using Blog.Entities.Models;
 using Blog.Entities.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ namespace Blog.Tests
         {
             // Arrange
             var mock = new Mock<IArticleService>();
-            mock.Setup(repo => repo.GetArticles(1)).Returns(Task.FromResult(new IndexViewModel
+            mock.Setup(repo => repo.GetArticles(1, null)).Returns(Task.FromResult(new IndexViewModel
             {
                 Articles = GetTestArticles(),
                 PageViewModel = new PageViewModel(0, 1, 3)
@@ -34,9 +35,9 @@ namespace Blog.Tests
             Assert.Equal(GetTestArticles().Count, model.Articles.Count());
         }
 
-        private List<Article> GetTestArticles()
+        private List<ArticleDTO> GetTestArticles()
         {
-            var Articles = new List<Article>
+            var Articles = new List<ArticleDTO>
             {
             };
             return Articles;

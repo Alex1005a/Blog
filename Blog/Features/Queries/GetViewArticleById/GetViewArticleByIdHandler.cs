@@ -1,18 +1,15 @@
 ﻿using AutoMapper;
-using Blog.Contracts;
 using Blog.Contracts.Queryinterfaces;
-using Blog.Data;
 using Blog.Entities.Models;
 using Blog.Entities.ViewModels;
 using Blog.Models;
 using Dapper;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Blog.Extensions;
 
 namespace Blog.Features.Queries.GetArticleById
 {

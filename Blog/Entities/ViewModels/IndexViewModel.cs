@@ -1,4 +1,5 @@
-﻿using Blog.Entities.Models;
+﻿using Blog.Entities.DTO;
+using Blog.Entities.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,8 @@ namespace Blog.Entities.ViewModels
 {
     public class IndexViewModel
     {
-        public IEnumerable<Article> Articles { get; set; }
+        public IEnumerable<ArticleDTO> Articles { get; set; }
         public PageViewModel PageViewModel { get; set; }
+        public string SearchString { get; set; }
     }
 }
