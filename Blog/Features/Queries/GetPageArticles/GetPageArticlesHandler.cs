@@ -66,12 +66,6 @@ namespace Blog.Features.Queries.GetPageArticles
                 return JsonConvert.DeserializeObject<IndexViewModel>(CacheValue);
             }
 
-            /*
-            IQueryable<Article> source = db.Articles.Skip((query.Page - 1) * pageSize).Take(pageSize);
-            var count = await source.CountAsync();
-            var items = await source.Skip((query.Page - 1) * pageSize).Take(pageSize).ToListAsync();
-            */
-
             var sql = @$"SELECT [a].[Id], [a].[Body], [a].[Title], [a].[UserId]
                          FROM [Articles] AS [a]
                          ORDER BY (SELECT 1)
@@ -82,7 +76,7 @@ namespace Blog.Features.Queries.GetPageArticles
             var articles = await conn.QueryAsync<ArticleDTO>(sql);
 
             int count = await conn.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM Articles");
-
+            conn.Close();
             PageViewModel pageViewModel1 = new PageViewModel(count, query.Page, pageSize);
 
             var model = new IndexViewModel

@@ -1,10 +1,14 @@
-﻿using Blog.Data;
+﻿using Blog.Contracts.CommandInterfeces;
+using Blog.Data;
+using Blog.Entities.Events;
+using Blog.Extensions;
 using Blog.Models;
-using Dapper;
+using RabbitMQ.Client;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Blog.Entities.Models
 {
@@ -36,15 +40,21 @@ namespace Blog.Entities.Models
             Body = body;
         }
 
-        public void AddVote(Vote vote, ApplicationDbContext db)
+        public async Task<CommonResult> AddVote(Vote vote, ApplicationDbContext db, IModel client)
         {
             var Vote = Votes.FirstOrDefault(u => u.UserId == vote.UserId);
             if (Vote == null)
             {
+                Vote = vote;
                 _votes.Add(vote);
             }
             else Vote.UpdateStatus(vote.Status);
-            db.SaveChanges();
+
+            await Task.Run(() => client.Send(new AddVoteEvent { VoteId = Vote.Id, Time = DateTime.Now }));
+
+            await db.SaveChangesAsync();
+
+            return new CommonResult(Vote.Id, "Vote adds", true);
         }
     }
 }

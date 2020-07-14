@@ -58,8 +58,8 @@ namespace Blog.Features.Queries.GetArticleById
                 await Task.Run(async() => await _distributedCache.AddCache(CacheKey, article));
             }
 
-            article.Votes = conn.Query<Vote>(@$"SELECT * FROM Votes WHERE ArticleId = {query.Id}").ToList();       
-
+            article.Votes = conn.Query<Vote>(@$"SELECT * FROM Votes WHERE ArticleId = {query.Id}").ToList();
+            conn.Close();
             return article;
             //return _mapper.Map<ArticleViewModel>(await db.Articles.FindAsync(query.Id)); 
         }

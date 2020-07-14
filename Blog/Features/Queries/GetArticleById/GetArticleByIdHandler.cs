@@ -34,8 +34,9 @@ namespace Blog.Features.Queries.GetArticleById
             var sql = @$"select * from Articles 
                          where Id = {query.Id}";
 
-            Article Article;
-
+            Article Article = (await conn.QueryAsync<Article>(sql)).First();
+            conn.Close();
+            /*
             if (CacheValue != null)
             {
                 Article = JsonConvert.DeserializeObject<Article>(CacheValue);
@@ -44,9 +45,9 @@ namespace Blog.Features.Queries.GetArticleById
             else
             {
                 Article = (await conn.QueryAsync<Article>(sql)).First();
-                await Task.Run(async () => await _distributedCache.AddCache(CacheKey, Article));
+                await Task.Run(async () => await _distributedCache.AddCache(CacheKey, JsonConvert.SerializeObject(Article)));
             }
-
+            */
             db.Entry(Article).State = EntityState.Unchanged;
             db.Entry(Article).Collection(u => u.Votes).Load();
 

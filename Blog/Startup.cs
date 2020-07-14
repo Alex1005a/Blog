@@ -57,6 +57,7 @@ namespace Blog
             services.AddAutoMapper(typeof(Startup));
 
             services.AddElasticsearch();
+            services.AddRabbitMQ();
 
             services.AddScoped<IUserProfileService, UserProfileService>();
             services.AddScoped<IArticleService, ArticleService>();

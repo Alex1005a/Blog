@@ -13,8 +13,7 @@ namespace Blog.Extensions
         {
             var options = new DistributedCacheEntryOptions
             {
-                SlidingExpiration = TimeSpan.FromSeconds(10),
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(22),
             };
             await cache.SetStringAsync(key, JsonConvert.SerializeObject(data), options);
         }
