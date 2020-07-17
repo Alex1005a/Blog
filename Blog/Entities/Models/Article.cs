@@ -3,6 +3,7 @@ using Blog.Data;
 using Blog.Entities.Events;
 using Blog.Extensions;
 using Blog.Models;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,6 @@ namespace Blog.Entities.Models
         public string UserId { get; private set; }
         public virtual User User { get; private set; }
         public virtual IReadOnlyCollection<Vote> Votes => _votes?.ToList();
-
         protected Article() { }
 
         public Article(string title, string body, string userId)
@@ -54,7 +54,7 @@ namespace Blog.Entities.Models
 
             await db.SaveChangesAsync();
 
-            return new CommonResult(Vote.Id, "Vote adds", true);
+            return new CommonResult(Vote.Id, "Vote add", true);
         }
     }
 }

@@ -47,8 +47,10 @@ namespace Blog.Extensions
 
             IBasicProperties basicProperties = channel.CreateBasicProperties();
 
-            Dictionary<string, object> headers = new Dictionary<string, object>();
-            headers.Add("class", ClassName);
+            Dictionary<string, object> headers = new Dictionary<string, object>
+            {
+                { "class", ClassName }
+            };
             basicProperties.Headers = headers;
             channel.BasicPublish(exchange: "",
                                     routingKey: "events",

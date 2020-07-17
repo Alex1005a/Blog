@@ -30,7 +30,8 @@ namespace Blog.Services
 
         public async Task<string> Login(LoginViewModel loginViewModel)
         {
-            var user = await _userManager.FindByEmailAsync(loginViewModel.Email);
+            string email = _userManager.NormalizeEmail(loginViewModel.Email);
+            var user = await _userManager.FindByEmailAsync(email);
 
             if (user != null)
             {
@@ -45,7 +46,7 @@ namespace Blog.Services
 
             if (result.Succeeded)
             {
-                _logger.LogInformation("User login in app");
+                _logger.LogInformation($"User {user.UserName} login in app");
                 return null;
             }
             else
@@ -124,17 +125,18 @@ namespace Blog.Services
         public async Task GetExternalLoginInfoAsync()
         {
             var info = await _signInManager.GetExternalLoginInfoAsync();
-            var user1 = await _userManager.FindByIdAsync(info.Principal.FindFirstValue(ClaimTypes.NameIdentifier));
+            //await _userManager.FindByIdAsync(info.Principal.FindFirstValue(ClaimTypes.NameIdentifier));
+            var user1 = await _userManager.FindByLoginAsync(info.LoginProvider, info.Principal.FindFirstValue(ClaimTypes.NameIdentifier));
 
             if (user1 != null)
             {
                 await _signInManager.SignInAsync(user1, isPersistent: false);
                 //info.Principal.FindFirstValue("image");
-                _logger.LogInformation($"User login in app with {info.ProviderDisplayName}");
+                _logger.LogInformation(info.Principal.FindFirstValue(ClaimTypes.Email));
                 return;
             }
           
-            var user = new User { Id = info.Principal.FindFirstValue(ClaimTypes.NameIdentifier), UserName = info.Principal.FindFirstValue(ClaimTypes.Name), Email = info.Principal.FindFirstValue(ClaimTypes.Email) };
+            var user = new User { UserName = info.Principal.FindFirstValue(ClaimTypes.Name), Email = info.Principal.FindFirstValue(ClaimTypes.Email) };
             var result = await _userManager.CreateAsync(user);
             if (result.Succeeded)
             {

@@ -8,6 +8,7 @@ using Blog.Features.Commands;
 using Blog.Features.Queries;
 using Blog.Models;
 using Blog.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -16,9 +17,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Blog
 {
@@ -49,6 +53,7 @@ namespace Blog
                 opts.Password.RequireUppercase = false; // требуются ли символы в верхнем регистре
                 opts.Password.RequireDigit = true; // требуются ли цифры
                 opts.User.AllowedUserNameCharacters = null;
+                //opts.User.RequireUniqueEmail = false;
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
@@ -89,13 +94,15 @@ namespace Blog
                 {
                     options.ClientId = Passwords.VkClientId;
                     options.ClientSecret = Passwords.VkClientSecret;
+                    //options.Scope.Add("email");
+                    //options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
                     options.Events.OnCreatingTicket = (context) =>
                     {
                         JObject json = JObject.Parse(context.User.ToString());
                         context.Identity.AddClaim(new Claim(ClaimTypes.Name, json["first_name"] + " " + json["last_name"]));
                         context.Identity.AddClaim(new Claim("image", json["photo"].ToString()));
 
-                        return System.Threading.Tasks.Task.CompletedTask;
+                        return Task.CompletedTask;
                     };
                 })
                 .AddGoogle(options =>
@@ -108,14 +115,14 @@ namespace Blog
                         JObject json = JObject.Parse(context.User.ToString());
                         context.Identity.AddClaim(new Claim("image", json["picture"].ToString()));
 
-                        return System.Threading.Tasks.Task.CompletedTask;
+                        return Task.CompletedTask;
                     };
                 });
 
             services.AddControllersWithViews();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -148,6 +155,25 @@ namespace Blog
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            CreateUserRoles(serviceProvider).Wait();
+        }
+
+        private async Task CreateUserRoles(IServiceProvider serviceProvider)
+        {
+            var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var UserManager = serviceProvider.GetRequiredService<UserManager<User>>();
+
+            var roleCheck = await RoleManager.RoleExistsAsync("God");
+            if (roleCheck == false)
+            {
+                await RoleManager.CreateAsync(new IdentityRole("God"));
+            }
+
+            User user = await UserManager.FindByIdAsync("107863644232334927327");
+            
+            if(user.PasswordHash == null & user.UserName == "Барон-Фон Копатыч")
+                await UserManager.AddToRoleAsync(user, "God");
         }
     }
 }
