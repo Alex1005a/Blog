@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -18,9 +19,19 @@ namespace Blog
 
         public IDbConnection GetDbConnection()
         {
-            var conn = new SqlConnection(_connectionString);
-            conn.Open();
-            return conn;
+            string postgresUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+            if (!String.IsNullOrEmpty(postgresUrl))
+            {
+                var conn = new NpgsqlConnection(postgresUrl);
+                conn.Open();
+                return conn;
+            }
+            else
+            {
+                var conn = new SqlConnection(_connectionString);
+                conn.Open();
+                return conn;
+            }
         }
     }
 

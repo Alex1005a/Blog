@@ -2,7 +2,9 @@
 using Blog.Contracts.CommandInterfeces;
 using Blog.Contracts.Queryinterfaces;
 using Blog.Contracts.Serviceinterfaces;
+using Blog.Entities.Models;
 using Blog.Entities.ViewModels;
+using Blog.Features.Commands.AddComment;
 using Blog.Features.Commands.CreateArticle;
 using Blog.Features.Queries.GetArticleById;
 using Blog.Features.Queries.GetPageArticles;
@@ -10,6 +12,7 @@ using Blog.Models;
 using Ganss.XSS;
 using Markdig;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 
 namespace Blog.Services
@@ -26,6 +29,14 @@ namespace Blog.Services
             _queryDispatcher = queryDispatcher;
             _commandDispatcher = commandDispatcher;
             _mapper = mapper;
+        }
+
+        public async Task AddComment(int articleId, string text, string userId)
+        {
+            var article = await _queryDispatcher.Execute<GetArticleById, Article>(new GetArticleById(articleId));
+            var result = await Task.Run(() => _commandDispatcher.Execute(new AddComment(text, userId, article, DateTime.Now)));
+
+            _logger.LogInformation($"User with Id {userId} add comment {result.Success}");
         }
 
         public async Task<int> Create(CreateArticleViewModel model, User user)

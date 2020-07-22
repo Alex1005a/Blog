@@ -127,15 +127,20 @@ namespace Blog.Services
             var info = await _signInManager.GetExternalLoginInfoAsync();
             //await _userManager.FindByIdAsync(info.Principal.FindFirstValue(ClaimTypes.NameIdentifier));
             var user1 = await _userManager.FindByLoginAsync(info.LoginProvider, info.Principal.FindFirstValue(ClaimTypes.NameIdentifier));
-
+            
             if (user1 != null)
             {
                 await _signInManager.SignInAsync(user1, isPersistent: false);
                 //info.Principal.FindFirstValue("image");
-                _logger.LogInformation(info.Principal.FindFirstValue(ClaimTypes.Email));
+                _logger.LogInformation($"User {user1.UserName} login with {info.LoginProvider}");
                 return;
             }
-          
+
+            if (info.Principal.FindFirstValue(ClaimTypes.Email) == null)
+            {
+                _logger.LogDebug($"User {info.Principal.FindFirstValue(ClaimTypes.NameIdentifier)} don't have email");
+            }
+
             var user = new User { UserName = info.Principal.FindFirstValue(ClaimTypes.Name), Email = info.Principal.FindFirstValue(ClaimTypes.Email) };
             var result = await _userManager.CreateAsync(user);
             if (result.Succeeded)
@@ -145,6 +150,13 @@ namespace Blog.Services
                 {
                     _logger.LogInformation($"New User login in app with {info.ProviderDisplayName}");
                     await _signInManager.SignInAsync(user, isPersistent: false);
+                }
+            }
+            else
+            {
+                foreach(var a in result.Errors)
+                {
+                    _logger.LogError(a.Code + " : " + a.Description);
                 }
             }
         }

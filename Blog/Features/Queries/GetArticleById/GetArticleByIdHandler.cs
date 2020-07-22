@@ -70,6 +70,8 @@ namespace Blog.Features.Queries.GetArticleById
             
             db.Entry(Article).State = EntityState.Unchanged;
             db.Entry(Article).Collection(u => u.Votes).Load();
+            db.Entry(Article).Collection(u => u.Comments).Load();
+            db.Entry(Article).Reference(u => u.User).Load();
 
             return Article;
         }

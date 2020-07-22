@@ -7,6 +7,6 @@ namespace Blog.Contracts.Serviceinterfaces
 {
     public interface IVoteSevice
     {
-        Task<IEnumerable<Vote>> AddVoteForArticle(int id, VoteStatus voteStatus, string userId);
+        Task AddVoteForArticle(int id, VoteStatus voteStatus, string userId);
     }
 }

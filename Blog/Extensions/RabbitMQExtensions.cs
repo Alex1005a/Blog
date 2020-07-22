@@ -14,13 +14,17 @@ namespace Blog.Extensions
     {
         public static void AddRabbitMQ(this IServiceCollection services)
         {
-            var factory = new ConnectionFactory()
+            var factory = new ConnectionFactory();
+            string url = Environment.GetEnvironmentVariable("CLOUDAMQP_URL");
+            if (String.IsNullOrEmpty(url))
             {
-                HostName = "localhost",
-                Port = 5672,
-                UserName = "root",
-                Password = "root"
-            };
+                factory.HostName = "localhost";
+                factory.Port = 5672;
+                factory.UserName = "root";
+                factory.Password = "root";
+            }
+            else factory.Uri = new Uri(url);
+
             var connection = factory.CreateConnection();
             var channel = connection.CreateModel();
             services.AddSingleton(channel);

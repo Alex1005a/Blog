@@ -24,13 +24,11 @@ namespace Blog.Services
             _commandDispatcher = commandDispatcher;
         }
 
-        public async Task<IEnumerable<Vote>> AddVoteForArticle(int articleId, VoteStatus voteStatus, string userId)
+        public async Task AddVoteForArticle(int articleId, VoteStatus voteStatus, string userId)
         {
             Article article = await _queryDispatcher.Execute<GetArticleById, Article>(new GetArticleById(articleId));
 
             await _commandDispatcher.Execute(new AddVote(voteStatus, userId, article));
-
-            return article.Votes;
         }
     }
 }

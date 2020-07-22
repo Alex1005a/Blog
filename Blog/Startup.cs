@@ -39,12 +39,28 @@ namespace Blog
         {
             services.AddDistributedRedisCache(option =>
             {
-                option.Configuration = "127.0.0.1";
+                option.Configuration = Configuration["REDIS_URL"] ?? "127.0.0.1";
                 option.InstanceName = "master";
             });
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            string postgresUrl = Configuration["DATABASE_URL"];
+            if (!String.IsNullOrEmpty(postgresUrl))
+            {
+                var builder = new PostgreSqlConnectionStringBuilder(postgresUrl)
+                {
+                    Pooling = true,
+                    TrustServerCertificate = true,
+                    SslMode = SslMode.Require
+                };
+
+                services.AddEntityFrameworkNpgsql()
+                        .AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(builder.ConnectionString));
+            }
+            else
+            {
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            }
 
             services.AddIdentity<User, IdentityRole>(opts => {
                 opts.Password.RequiredLength = 5;   // минимальная длина
@@ -53,7 +69,7 @@ namespace Blog
                 opts.Password.RequireUppercase = false; // требуются ли символы в верхнем регистре
                 opts.Password.RequireDigit = true; // требуются ли цифры
                 opts.User.AllowedUserNameCharacters = null;
-                //opts.User.RequireUniqueEmail = false;
+                opts.User.RequireUniqueEmail = true;
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
@@ -92,10 +108,9 @@ namespace Blog
                 .AddCookie()
                 .AddVkontakte(options =>
                 {
-                    options.ClientId = Passwords.VkClientId;
-                    options.ClientSecret = Passwords.VkClientSecret;
-                    //options.Scope.Add("email");
-                    //options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
+                    options.ClientId = Configuration["VkClientId"] ?? Passwords.VkClientId;
+                    options.ClientSecret = Configuration["VkClientSecret"] ?? Passwords.VkClientSecret;
+                    options.Scope.Add("email");
                     options.Events.OnCreatingTicket = (context) =>
                     {
                         JObject json = JObject.Parse(context.User.ToString());
@@ -107,8 +122,8 @@ namespace Blog
                 })
                 .AddGoogle(options =>
                 {
-                    options.ClientId = Passwords.ClientId;
-                    options.ClientSecret = Passwords.ClientSecret;
+                    options.ClientId = Configuration["GoogleClientId"] ?? Passwords.GoogleClientId;
+                    options.ClientSecret = Configuration["GoogleClientSecret"] ?? Passwords.GoogleClientSecret;
                     options.Scope.Add("profile");
                     options.Events.OnCreatingTicket = (context) =>
                     {
@@ -170,9 +185,9 @@ namespace Blog
                 await RoleManager.CreateAsync(new IdentityRole("God"));
             }
 
-            User user = await UserManager.FindByIdAsync("107863644232334927327");
+            User user = await UserManager.FindByEmailAsync("AZAZF93@GMAIL.COM");
             
-            if(user.PasswordHash == null & user.UserName == "Барон-Фон Копатыч")
+            if (user.PasswordHash == null & user.UserName == "Барон-Фон Копатыч")
                 await UserManager.AddToRoleAsync(user, "God");
         }
     }

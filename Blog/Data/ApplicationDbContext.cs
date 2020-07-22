@@ -16,6 +16,7 @@ namespace Blog.Data
 
         public DbSet<Article> Articles { get; set; }
         public DbSet<Vote> Votes { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -29,6 +30,11 @@ namespace Blog.Data
                .Metadata
                .FindNavigation(nameof(Article.Votes))
                .SetPropertyAccessMode(PropertyAccessMode.Field);
+
+            modelBuilder.Entity<Article>()
+              .Metadata
+              .FindNavigation(nameof(Article.Comments))
+              .SetPropertyAccessMode(PropertyAccessMode.Field);
 
             modelBuilder.Entity<User>()
                .Metadata

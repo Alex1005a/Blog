@@ -66,8 +66,8 @@ namespace Blog.Features.Queries.GetPageArticles
                 return JsonConvert.DeserializeObject<IndexViewModel>(CacheValue);
             }
 
-            var sql = @$"SELECT [a].[Id], [a].[Body], [a].[Title], [a].[UserId]
-                         FROM [Articles] AS [a]
+            var sql = @$"SELECT *
+                         FROM Articles AS a
                          ORDER BY (SELECT 1)
                          OFFSET {(query.Page - 1) * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY";
 

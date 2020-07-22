@@ -25,11 +25,11 @@ namespace Blog.Features.Commands.AddVote
         public async Task<ICommonResult> Execute(AddVote model)
         {
             var vote = new Vote
-                       (
-                           model.VoteStatus,
-                           model.UserId,
-                           model.Article.Id
-                       );
+            (
+                model.VoteStatus,
+                model.UserId,
+                model.Article.Id
+            );
 
             return await Task.Run(() => model.Article.AddVote(vote, db, client));          
         }

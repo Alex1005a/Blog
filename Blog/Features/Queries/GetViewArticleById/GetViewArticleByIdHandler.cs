@@ -59,6 +59,7 @@ namespace Blog.Features.Queries.GetArticleById
             }
 
             article.Votes = conn.Query<Vote>(@$"SELECT * FROM Votes WHERE ArticleId = {query.Id}").ToList();
+            article.Comments = conn.Query<Comment>(@$"SELECT * FROM Comments WHERE ArticleId = {query.Id}").ToList();
             conn.Close();
             return article;
             //return _mapper.Map<ArticleViewModel>(await db.Articles.FindAsync(query.Id)); 

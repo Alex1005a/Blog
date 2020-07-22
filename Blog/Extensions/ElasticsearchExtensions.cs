@@ -14,7 +14,7 @@ namespace Blog.Extensions
     {
         public static void AddElasticsearch(this IServiceCollection services)
         {
-            var url = "http://localhost:9200";
+            var url = Environment.GetEnvironmentVariable("BONSAI_URL") ?? "http://localhost:9200";
             var defaultIndex = "articles";
 
             var settings = new ConnectionSettings(new Uri(url))

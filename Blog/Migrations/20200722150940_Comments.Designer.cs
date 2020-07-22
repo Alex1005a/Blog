@@ -4,14 +4,16 @@ using Blog.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Blog.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200722150940_Comments")]
+    partial class Comments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,7 +51,10 @@ namespace Blog.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("ArticleId")
+                    b.Property<string>("ArticleId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ArticleId1")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DateTime")
@@ -64,7 +69,7 @@ namespace Blog.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ArticleId");
+                    b.HasIndex("ArticleId1");
 
                     b.HasIndex("UserId");
 
@@ -302,10 +307,8 @@ namespace Blog.Migrations
             modelBuilder.Entity("Blog.Entities.Models.Comment", b =>
                 {
                     b.HasOne("Blog.Entities.Models.Article", "Article")
-                        .WithMany("Comments")
-                        .HasForeignKey("ArticleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("ArticleId1");
 
                     b.HasOne("Blog.Models.User", "User")
                         .WithMany()

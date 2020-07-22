@@ -16,6 +16,7 @@ namespace Blog.Entities.Models
     public class Article
     {
         private readonly HashSet<Vote> _votes;
+        private readonly HashSet<Comment> _comments;
 
         [Key]
         public int Id { get; private set; }
@@ -24,6 +25,7 @@ namespace Blog.Entities.Models
         public string UserId { get; private set; }
         public virtual User User { get; private set; }
         public virtual IReadOnlyCollection<Vote> Votes => _votes?.ToList();
+        public virtual IReadOnlyCollection<Comment> Comments => _comments?.ToList();
         protected Article() { }
 
         public Article(string title, string body, string userId)
@@ -32,6 +34,7 @@ namespace Blog.Entities.Models
             Body = body;
             UserId = userId;
             _votes = new HashSet<Vote>();
+            _comments = new HashSet<Comment>();
         }
 
         public void UpdateArticle(string title, string body)
@@ -40,7 +43,7 @@ namespace Blog.Entities.Models
             Body = body;
         }
 
-        public async Task<CommonResult> AddVote(Vote vote, ApplicationDbContext db, IModel client)
+        public async Task<ICommonResult> AddVote(Vote vote, ApplicationDbContext db, IModel client)
         {
             var Vote = Votes.FirstOrDefault(u => u.UserId == vote.UserId);
             if (Vote == null)
@@ -50,11 +53,19 @@ namespace Blog.Entities.Models
             }
             else Vote.UpdateStatus(vote.Status);
 
-            await Task.Run(() => client.Send(new AddVoteEvent { VoteId = Vote.Id, Time = DateTime.Now }));
+            await Task.Run(() => client.Send(new AddVoteEvent { Vote = Vote, Time = DateTime.Now }));
 
             await db.SaveChangesAsync();
 
             return new CommonResult(Vote.Id, "Vote add", true);
+        }
+        public async Task<ICommonResult> AddComment(Comment comment, ApplicationDbContext db)
+        {
+            _comments.Add(comment);
+
+            await db.SaveChangesAsync();
+
+            return new CommonResult(comment.Id, "comment add", true);
         }
     }
 }

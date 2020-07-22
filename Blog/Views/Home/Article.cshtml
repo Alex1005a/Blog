@@ -14,15 +14,25 @@
         <input type="submit" value="Плюс" />
     </div>
 </form>
-
 <form id="minus" method="post" asp-controller="Home" asp-action="AddVoteForArticle" asp-route-id="@Model.Id" asp-route-voteStatus="@Blog.Entities.Models.VoteStatus.Minus">
     <div>
         <input type="submit" value="Минус" />
     </div>
 </form>
+@foreach (var a in Model.Comments)
+{
 
-
-
+    <a>@a.Text</a>
+}
+<form id="minus" method="post" asp-controller="Home" asp-action="AddCommentForArticle" asp-route-id="@Model.Id">
+    <div>
+        <textarea name="text" maxlength="350" cols="33" rows="7"></textarea>
+    </div>
+    <div>
+        <input type="submit" value="Добавить комментарий" />
+    </div>
+</form>
+<!--
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <script>
     $(document).ready(function () {
@@ -62,3 +72,4 @@
         });
     });
 </script>
+-->

@@ -42,9 +42,16 @@ namespace Blog.Controllers
         [HttpPost]
         public async Task<IActionResult> AddVoteForArticle(int id, VoteStatus voteStatus)
         {
-            var votes = await _voteSevice.AddVoteForArticle(id, voteStatus, await _userProfile.GetUserId(User));
-            //return RedirectToAction("Article", new { id });
-            return PartialView("GetAssessment", votes);
+            await _voteSevice.AddVoteForArticle(id, voteStatus, await _userProfile.GetUserId(User));
+            return RedirectToAction("Article", new { id });
+            //return PartialView("GetAssessment", votes);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddCommentForArticle(int id, string text)
+        {
+            await _articleService.AddComment(id, text, await _userProfile.GetUserId(User));
+            return RedirectToAction("Article", new { id });
+            //return PartialView("GetAssessment", votes);
         }
 
         public IActionResult Privacy() => View();

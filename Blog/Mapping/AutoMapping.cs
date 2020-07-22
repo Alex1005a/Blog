@@ -2,6 +2,7 @@
 using Blog.Entities.DTO;
 using Blog.Entities.Models;
 using Blog.Entities.ViewModels;
+using Blog.Features.Commands.AddComment;
 using Blog.Features.Commands.CreateArticle;
 
 namespace Blog.Mapping
@@ -13,6 +14,7 @@ namespace Blog.Mapping
             CreateMap<Article, ArticleViewModel>();
             CreateMap<CreateArticleViewModel, CreateArticle>();
             CreateMap<CreateArticle, Article>();
+            CreateMap<AddComment, Comment>();
         }
     }
 }

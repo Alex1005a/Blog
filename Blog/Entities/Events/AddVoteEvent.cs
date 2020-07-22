@@ -9,7 +9,7 @@ namespace Blog.Entities.Events
 {
     public class AddVoteEvent : IEvent
     {
-        public int VoteId { get; set; }
+        public Vote Vote { get; set; }
         public DateTime Time { get; set; }
     }
 }

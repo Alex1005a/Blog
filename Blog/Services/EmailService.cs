@@ -1,6 +1,7 @@
 ﻿using MailKit.Net.Smtp;
 using Microsoft.Extensions.Logging;
 using MimeKit;
+using System;
 using System.Threading.Tasks;
 
 namespace Blog.Services
@@ -8,6 +9,8 @@ namespace Blog.Services
     public class EmailService
     {
         private readonly ILogger<EmailService> _logger;
+        string MyEmail = Environment.GetEnvironmentVariable("EMAIL") ?? "corovavirus777@gmail.com";
+        string MyPassword = Environment.GetEnvironmentVariable("PASSWORD") ?? Passwords.EmailPass;
         public EmailService(ILogger<EmailService> logger)
         {
             _logger = logger;
@@ -16,7 +19,7 @@ namespace Blog.Services
         {
             var emailMessage = new MimeMessage();
 
-            emailMessage.From.Add(new MailboxAddress("Администрация сайта", "corovavirus777@gmail.com"));
+            emailMessage.From.Add(new MailboxAddress("Администрация сайта", MyEmail));
             emailMessage.To.Add(new MailboxAddress("", email));
             emailMessage.Subject = subject;
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
@@ -26,7 +29,7 @@ namespace Blog.Services
 
             using var client = new SmtpClient();
             await client.ConnectAsync("smtp.gmail.com", 25, false);
-            await client.AuthenticateAsync("corovavirus777@gmail.com", Passwords.EmailPass);
+            await client.AuthenticateAsync(MyEmail, MyPassword);
             await client.SendAsync(emailMessage);
 
             _logger.LogInformation($"Sen messege to {email}");
