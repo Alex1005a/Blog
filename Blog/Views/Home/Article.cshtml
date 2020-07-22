@@ -21,10 +21,10 @@
 </form>
 @foreach (var a in Model.Comments)
 {
-
+    <a>@a.User.UserName</a>
     <a>@a.Text</a>
 }
-<form id="minus" method="post" asp-controller="Home" asp-action="AddCommentForArticle" asp-route-id="@Model.Id">
+<form method="post" asp-controller="Home" asp-action="AddCommentForArticle" asp-route-id="@Model.Id">
     <div>
         <textarea name="text" maxlength="350" cols="33" rows="7"></textarea>
     </div>

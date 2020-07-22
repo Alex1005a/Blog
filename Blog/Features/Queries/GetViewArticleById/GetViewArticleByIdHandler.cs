@@ -10,25 +10,29 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Blog.Extensions;
+using Blog.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Blog.Features.Queries.GetArticleById
 {
     public class GetViewArticleByIdHandler : IQueryHandler<GetViewArticleById, ArticleViewModel>
     {
         private readonly IMapper _mapper;
-        private readonly IDbConnectionFactory db;
+        private readonly IDbConnectionFactory context;
         private readonly IDistributedCache _distributedCache;
+        private readonly ApplicationDbContext db;
 
-        public GetViewArticleByIdHandler(IDbConnectionFactory context, IMapper mapper, IDistributedCache distributedCache)
+        public GetViewArticleByIdHandler(IDbConnectionFactory context, IMapper mapper, IDistributedCache distributedCache, ApplicationDbContext db)
         {
-            db = context;
+            this.context = context;
             _mapper = mapper;
             _distributedCache = distributedCache;
+            this.db = db;
         }
 
         public async Task<ArticleViewModel> Execute(GetViewArticleById query)
         {
-            using IDbConnection conn = db.GetDbConnection();
+            using IDbConnection conn = context.GetDbConnection();
 
             string CacheKey = $"ViewArticle-{query.Id}";
             string CacheValue = await _distributedCache.GetStringAsync(CacheKey);
@@ -59,7 +63,13 @@ namespace Blog.Features.Queries.GetArticleById
             }
 
             article.Votes = conn.Query<Vote>(@$"SELECT * FROM Votes WHERE ArticleId = {query.Id}").ToList();
-            article.Comments = conn.Query<Comment>(@$"SELECT * FROM Comments WHERE ArticleId = {query.Id}").ToList();
+            var Comments = conn.Query<Comment>(@$"SELECT * FROM Comments WHERE ArticleId = {query.Id}").ToList();
+            foreach(var a in Comments)
+            {
+                db.Entry(a).State = EntityState.Unchanged;
+                db.Entry(a).Reference(u => u.User).Load();
+            }
+            article.Comments = Comments;
             conn.Close();
             return article;
             //return _mapper.Map<ArticleViewModel>(await db.Articles.FindAsync(query.Id)); 

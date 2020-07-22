@@ -105,7 +105,10 @@ namespace Blog
 
 
             services.AddAuthentication()
-                .AddCookie()
+                .AddCookie(options =>
+                {
+                    options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
+                })
                 .AddVkontakte(options =>
                 {
                     options.ClientId = Configuration["VkClientId"] ?? Passwords.VkClientId;
