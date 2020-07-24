@@ -1,13 +1,17 @@
 ﻿using Blog.Contracts;
 using Blog.Contracts.Serviceinterfaces;
+using Blog.Data;
 using Blog.Entities.ViewModels;
 using Blog.Models;
 using Blog.ViewModels;
+using Dropbox.Api;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -19,13 +23,18 @@ namespace Blog.Services
         private readonly SignInManager<User> _signInManager;
         private readonly EmailService _emailService;
         private readonly ILogger<UserProfileService> _logger;
+        private readonly DropboxClient client;
+        private readonly ApplicationDbContext db;
 
-        public UserProfileService(UserManager<User> userManager, SignInManager<User> signInManager, EmailService emailService, ILogger<UserProfileService> logger)
+        public UserProfileService(UserManager<User> userManager, SignInManager<User> signInManager, 
+            EmailService emailService, ILogger<UserProfileService> logger, ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailService = emailService;
             _logger = logger;
+            client =  new DropboxClient(Environment.GetEnvironmentVariable("DropboxToken") ?? Passwords.DropboxToken);
+            db = context;
         }
 
         public async Task<string> Login(LoginViewModel loginViewModel)
@@ -159,6 +168,18 @@ namespace Blog.Services
                     _logger.LogError(a.Code + " : " + a.Description);
                 }
             }
+        }
+        public async Task<string> AddImgUrl(IFormFile uploadedFile, User user)
+        {
+            string remotePath = "/IMG/" + Guid.NewGuid().ToString() + uploadedFile.FileName;
+
+            await client.Files.UploadAsync(remotePath, body: uploadedFile.OpenReadStream());
+
+            var result = await client.Sharing.CreateSharedLinkWithSettingsAsync(remotePath);
+            var url = result.Url;
+            string newUrl = url.Substring(0, url.Length - 4) + "raw=1";
+            user.AddImgUrl(newUrl, db);
+            return newUrl;
         }
     }
 }

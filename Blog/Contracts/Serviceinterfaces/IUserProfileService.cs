@@ -20,5 +20,6 @@ namespace Blog.Contracts.Serviceinterfaces
         Task<bool> ConfirmEmail(string userId, string code);
         AuthenticationProperties ExternalLogin(string provider, string redirectUrl);
         Task GetExternalLoginInfoAsync();
+        Task<string> AddImgUrl(IFormFile uploadedFile, User user);
     }
 }

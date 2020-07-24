@@ -81,7 +81,7 @@ namespace Blog.Controllers
             // удаляем аутентификационные куки
             await _userProfileService.Logout();
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login", "Account");
         }
 
         [HttpPost]

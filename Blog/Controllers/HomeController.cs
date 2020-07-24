@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Blog.Entities.Models;
 using Blog.Entities.ViewModels;
 using Blog.Contracts.Serviceinterfaces;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
+using System.Linq;
+using Newtonsoft.Json;
 
 namespace Blog.Controllers
 {
@@ -25,6 +29,15 @@ namespace Blog.Controllers
 
         //[Route("Index/page{page:int}")]
         public async Task<IActionResult> Index(int page = 1, string searchString = null) => View(await _articleService.GetArticles(page, searchString));
+
+
+        [HttpPost]
+        public async Task<IActionResult> AddFile(IFormFileCollection uploads)
+        {
+            string url = await _userProfile.AddImgUrl(uploads.First(), await _userProfile.GetUserAsync(User));
+
+            return Json(new { url, success = true });
+        }
 
         [HttpGet]
         public IActionResult CreateArticle() => View();
@@ -46,6 +59,7 @@ namespace Blog.Controllers
             return RedirectToAction("Article", new { id });
             //return PartialView("GetAssessment", votes);
         }
+
         [HttpPost]
         public async Task<IActionResult> AddCommentForArticle(int id, string text)
         {

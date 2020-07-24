@@ -1,16 +1,23 @@
 ﻿@model Blog.Entities.ViewModels.IndexViewModel
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<User> UserManager
 @{
     ViewData["Title"] = "Home Page";
+    string imgUrl = (await UserManager.GetUserAsync(User)).ImageUrl;
+    string defaultImg = "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRVNjvUQD072GrkS1SUlQN-aKG_rkAit5-t6A&usqp=CAU)";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+<img id="avatar" src="@Url.Content(imgUrl ?? defaultImg)" alt="Аватар" />
+
 <a class="btn-primary" style="float:right" asp-action="CreateArticle">Создать статью</a>
 <form method="get">
     <input type="text" name="searchString" />
-    <input type="submit"/>
+    <input type="submit" />
 </form>
 <div>
     @foreach (var article in Model.Articles)
@@ -43,3 +50,46 @@
 <form method="post" asp-controller="Account" asp-action="Logout">
     <input type="submit" value="Выход" />
 </form>
+
+<form id="AddIMG" asp-action="AddFile" asp-controller="Home" method="post" enctype="multipart/form-data">
+    <input type="file" id="myFileField" name="uploads" /><br>
+    <input type="submit" value="Загрузить аватар" />
+</form>
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script>
+
+
+    $(document).ready(function () {
+        $('#AddIMG').on("submit", function (e) {
+            e.preventDefault();
+            alert("файл загружается");
+
+            var formData = new FormData(this);
+            //formData.append('file', $('#myFileField')[0].files[0]);
+            $(this)[0].reset();
+            $.ajax({
+                url: '@Url.Action("AddFile", "Home")',
+                type: 'POST',
+                data: formData,
+                dataType: "json",
+                processData: false,  // tell jQuery not to process the data
+                contentType: false,  // tell jQuery not to set contentType
+                success: function (jsonResponse) {
+                    if (jsonResponse.success) {
+                        document.getElementById("avatar").src = jsonResponse.url;
+                        alert("Аватар загружен");
+                    }
+                    else {
+                        alert("Ошибка");
+                    }
+                },
+                error: function (jqXHR) {
+                    alert(jqXHR);
+                }
+            });
+            //return false;
+        });
+    });
+
+</script>
