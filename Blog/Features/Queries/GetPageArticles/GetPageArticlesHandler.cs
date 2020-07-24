@@ -29,13 +29,13 @@ namespace Blog.Features.Queries.GetPageArticles
 
         public async Task<IndexViewModel> Execute(GetPageArticles query)
         {
-            using var conn = db.GetDbConnection();
+            //using var conn = db.GetDbConnection();
 
             int pageSize = 3;
 
-            if (!string.IsNullOrEmpty(query.SearchString))
-            {
-                var result = client.Search<ArticleDTO>(descriptor => descriptor
+            var result = client.Search<ArticleDTO>(descriptor => descriptor
+                                .From((query.Page - 1) * pageSize)
+                                .Size(pageSize)
                                 .Query(q => q
                                    .Match(m => m
                                       .Field(f => f.Title)
@@ -45,50 +45,36 @@ namespace Blog.Features.Queries.GetPageArticles
                                 )
                            );
 
-                IEnumerable<ArticleDTO> source = result.Documents.Skip((query.Page - 1) * pageSize).Take(pageSize);
-                var items = source.Skip((query.Page - 1) * pageSize).Take(pageSize);
+            //IEnumerable<ArticleDTO> source = result.Documents.Skip((query.Page - 1) * pageSize).Take(pageSize);
+            //var items = source.Skip((query.Page - 1) * pageSize).Take(pageSize);
 
-                PageViewModel pageViewModel = new PageViewModel(result.Documents.Count, query.Page, pageSize);
+            int count;
 
-                return new IndexViewModel
-                {
-                    PageViewModel = pageViewModel,
-                    Articles = items,
-                    SearchString = query.SearchString
-                };
+            if (!string.IsNullOrEmpty(query.SearchString))
+            {
+                count = (int)client.Count<ArticleDTO>(descriptor => descriptor
+                                .Query(q => q
+                                   .Match(m => m
+                                      .Field(f => f.Title)
+                                      .Query(query.SearchString)
+                                      .Fuzziness(Fuzziness.EditDistance(3))
+                                   )
+                                )
+                           ).Count;
+            }
+            else
+            {
+                count = (int)(await client.CountAsync<ArticleDTO>()).Count;
             }
 
-            string CacheKey = $"PageArticles-{query.Page}";
-            string CacheValue = await _distributedCache.GetStringAsync(CacheKey);
+            PageViewModel pageViewModel = new PageViewModel(count, query.Page, pageSize);
 
-            if (CacheValue != null)
+            return new IndexViewModel
             {
-                return JsonConvert.DeserializeObject<IndexViewModel>(CacheValue);
-            }
-
-            var sql = @$"SELECT *
-                         FROM Articles AS a
-                         ORDER BY (SELECT 1)
-                         OFFSET {(query.Page - 1) * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY";
-
-            
-
-            var articles = await conn.QueryAsync<ArticleDTO>(sql);
-
-            int count = await conn.ExecuteScalarAsync<int>(@"SELECT COUNT(*) FROM Articles");
-            conn.Close();
-            PageViewModel pageViewModel1 = new PageViewModel(count, query.Page, pageSize);
-
-            var model = new IndexViewModel
-            {
-                PageViewModel = pageViewModel1,
-                Articles = articles,
+                PageViewModel = pageViewModel,
+                Articles = result.Documents,
                 SearchString = query.SearchString
             };
-
-            await Task.Run(async() => await _distributedCache.AddCache(CacheKey, model));
-
-            return model;
         }
     }
 }
