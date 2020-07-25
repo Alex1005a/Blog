@@ -16,7 +16,7 @@
 
 <a class="btn-primary" style="float:right" asp-action="CreateArticle">Создать статью</a>
 <form method="get">
-    <input type="text" name="searchString" />
+    <input type="text" value="@Model.SearchString" name="searchString" />
     <input type="submit" value="Искать" />
 </form>
 <div>

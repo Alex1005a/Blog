@@ -36,6 +36,7 @@ namespace Blog.Extensions
                 .Ignore(p => p.Body)
                 .Ignore(p => p.User)
                 .Ignore(p => p.Votes)
+                .Ignore(p => p.Comments)
             );
         }
 

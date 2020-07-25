@@ -39,6 +39,8 @@ namespace Blog.Tests
         {
             var Articles = new List<ArticleDTO>
             {
+                new ArticleDTO{Id = 1, Title = "Статья 1", UserId = "UserId1" },
+                new ArticleDTO{Id = 2, Title = "Статья 2", UserId = "UserId2" }
             };
             return Articles;
         }

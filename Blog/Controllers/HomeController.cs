@@ -32,7 +32,7 @@ namespace Blog.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> AddFile(IFormFileCollection uploads)
+        public async Task<JsonResult> AddFile(IFormFileCollection uploads)
         {
             string url = await _userProfile.AddImgUrl(uploads.First(), await _userProfile.GetUserAsync(User));
 
@@ -65,7 +65,6 @@ namespace Blog.Controllers
         {
             await _articleService.AddComment(id, text, await _userProfile.GetUserId(User));
             return RedirectToAction("Article", new { id });
-            //return PartialView("GetAssessment", votes);
         }
 
         public IActionResult Privacy() => View();

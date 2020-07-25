@@ -16,14 +16,10 @@ namespace Blog.Features.Queries.GetPageArticles
 {
     public class GetPageArticlesHandler : IQueryHandler<GetPageArticles, IndexViewModel>
     {
-        private readonly IDbConnectionFactory db;
-        private readonly IDistributedCache _distributedCache;
         private readonly ElasticClient client;
 
-        public GetPageArticlesHandler(IDbConnectionFactory context, IDistributedCache distributedCache, ElasticClient _client)
+        public GetPageArticlesHandler(ElasticClient _client)
         {
-            db = context;
-            _distributedCache = distributedCache;
             client = _client;
         }
 
@@ -33,7 +29,7 @@ namespace Blog.Features.Queries.GetPageArticles
 
             int pageSize = 3;
 
-            var result = client.Search<ArticleDTO>(descriptor => descriptor
+            var result = await client.SearchAsync<ArticleDTO>(descriptor => descriptor
                                 .From((query.Page - 1) * pageSize)
                                 .Size(pageSize)
                                 .Query(q => q
@@ -48,11 +44,7 @@ namespace Blog.Features.Queries.GetPageArticles
             //IEnumerable<ArticleDTO> source = result.Documents.Skip((query.Page - 1) * pageSize).Take(pageSize);
             //var items = source.Skip((query.Page - 1) * pageSize).Take(pageSize);
 
-            int count;
-
-            if (!string.IsNullOrEmpty(query.SearchString))
-            {
-                count = (int)client.Count<ArticleDTO>(descriptor => descriptor
+            int count = (int) (await client.CountAsync<ArticleDTO>(descriptor => descriptor
                                 .Query(q => q
                                    .Match(m => m
                                       .Field(f => f.Title)
@@ -60,12 +52,7 @@ namespace Blog.Features.Queries.GetPageArticles
                                       .Fuzziness(Fuzziness.EditDistance(3))
                                    )
                                 )
-                           ).Count;
-            }
-            else
-            {
-                count = (int)(await client.CountAsync<ArticleDTO>()).Count;
-            }
+                           )).Count;
 
             PageViewModel pageViewModel = new PageViewModel(count, query.Page, pageSize);
 
