@@ -11,6 +11,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using Blog.Entities.DTO;
+using System;
 
 namespace Blog.Features.Queries.GetPageArticles
 {
@@ -25,34 +26,24 @@ namespace Blog.Features.Queries.GetPageArticles
 
         public async Task<IndexViewModel> Execute(GetPageArticles query)
         {
-            //using var conn = db.GetDbConnection();
+            Func<QueryContainerDescriptor<ArticleDTO>, QueryContainer> searchQuery =
+                q => q.Match(m => m
+                               .Field(f => f.Title)
+                               .Query(query.SearchString)
+                                .Fuzziness(Fuzziness.EditDistance(3))
+                             );
 
             int pageSize = 3;
 
             var result = await client.SearchAsync<ArticleDTO>(descriptor => descriptor
                                 .From((query.Page - 1) * pageSize)
                                 .Size(pageSize)
-                                .Query(q => q
-                                   .Match(m => m
-                                      .Field(f => f.Title)
-                                      .Query(query.SearchString)
-                                      .Fuzziness(Fuzziness.EditDistance(3))
-                                   )
-                                )
+                                .Query(searchQuery)
                            );
 
-            //IEnumerable<ArticleDTO> source = result.Documents.Skip((query.Page - 1) * pageSize).Take(pageSize);
-            //var items = source.Skip((query.Page - 1) * pageSize).Take(pageSize);
-
             int count = (int) (await client.CountAsync<ArticleDTO>(descriptor => descriptor
-                                .Query(q => q
-                                   .Match(m => m
-                                      .Field(f => f.Title)
-                                      .Query(query.SearchString)
-                                      .Fuzziness(Fuzziness.EditDistance(3))
-                                   )
-                                )
-                           )).Count;
+                                .Query(searchQuery)
+                              )).Count;
 
             PageViewModel pageViewModel = new PageViewModel(count, query.Page, pageSize);
 
