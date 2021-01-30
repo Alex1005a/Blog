@@ -1,12 +1,8 @@
 ﻿using Blog.Entities.DTO;
 using Blog.Entities.Models;
-using Blog.Migrations;
 using Microsoft.Extensions.DependencyInjection;
 using Nest;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Blog.Extensions
 {
@@ -18,7 +14,8 @@ namespace Blog.Extensions
             var defaultIndex = "articles";
 
             var settings = new ConnectionSettings(new Uri(url))
-                .DefaultIndex(defaultIndex);
+                .DefaultIndex(defaultIndex).DisableDirectStreaming()
+                                           .PrettyJson();
 
             AddDefaultMappings(settings);
 
