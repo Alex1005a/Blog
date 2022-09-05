@@ -35,22 +35,22 @@ namespace Blog.Features.Queries.GetPageArticles
 
             int pageSize = 3;
 
-            var result = await client.SearchAsync<ArticleDTO>(descriptor => descriptor
+            var resultTask = client.SearchAsync<ArticleDTO>(descriptor => descriptor
                                 .From((query.Page - 1) * pageSize)
                                 .Size(pageSize)
                                 .Query(searchQuery)
-                           );
+                             );
 
-            int count = (int) (await client.CountAsync<ArticleDTO>(descriptor => descriptor
+            var countTask = client.CountAsync<ArticleDTO>(descriptor => descriptor
                                 .Query(searchQuery)
-                              )).Count;
+                              );
 
-            PageViewModel pageViewModel = new PageViewModel(count, query.Page, pageSize);
+            PageViewModel pageViewModel = new PageViewModel((int)(await countTask).Count, query.Page, pageSize);
 
             return new IndexViewModel
             {
                 PageViewModel = pageViewModel,
-                Articles = result.Documents,
+                Articles = (await resultTask).Documents,
                 SearchString = query.SearchString
             };
         }

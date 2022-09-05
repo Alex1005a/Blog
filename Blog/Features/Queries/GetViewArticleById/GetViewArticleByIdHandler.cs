@@ -32,13 +32,13 @@ namespace Blog.Features.Queries.GetArticleById
 
         public async Task<ArticleViewModel> Execute(GetViewArticleById query)
         {
+            string CacheKey = $"ViewArticle-{query.Id}";
+            var getStringTask = _distributedCache.GetStringAsync(CacheKey);
+
             using IDbConnection conn = context.GetDbConnection();
 
-            string CacheKey = $"ViewArticle-{query.Id}";
-            string CacheValue = await _distributedCache.GetStringAsync(CacheKey);
-
             ArticleViewModel article;
-
+            string CacheValue = await getStringTask;
             if (CacheValue != null)
             {
                 article = JsonConvert.DeserializeObject<ArticleViewModel>(CacheValue);
@@ -59,11 +59,14 @@ namespace Blog.Features.Queries.GetArticleById
                     })
                     ).First();
 
-                await Task.Run(async() => await _distributedCache.AddCache(CacheKey, article));
+                await _distributedCache.AddCache(CacheKey, article);
             }
 
-            article.Votes = conn.Query<Vote>(@$"SELECT * FROM Votes WHERE ArticleId = {query.Id}").ToList();
-            var Comments = conn.Query<Comment>(@$"SELECT * FROM Comments WHERE ArticleId = {query.Id}").ToList();
+            var getVotesTask = conn.QueryAsync<Vote>(@$"SELECT * FROM Votes WHERE ArticleId = {query.Id}");
+            var getCommentsTask = conn.QueryAsync<Comment>(@$"SELECT * FROM Comments WHERE ArticleId = {query.Id}");
+
+            article.Votes = (await getVotesTask).ToList();
+            var Comments = (await getCommentsTask).ToList(); ;
             foreach(var a in Comments)
             {
                 db.Entry(a).State = EntityState.Unchanged;
@@ -72,7 +75,6 @@ namespace Blog.Features.Queries.GetArticleById
             article.Comments = Comments;
             conn.Close();
             return article;
-            //return _mapper.Map<ArticleViewModel>(await db.Articles.FindAsync(query.Id)); 
         }
     }
 }

@@ -31,17 +31,17 @@ namespace Blog.Features.Queries.GetArticleById
         }
         public async Task<Article> Execute(GetArticleById query)
         {
-            using IDbConnection conn = DbConnection.GetDbConnection();
-
             string CacheKey = $"Article-{query.Id}";
-            string CacheValue = await _distributedCache.GetStringAsync(CacheKey);
+            var getStringTask = _distributedCache.GetStringAsync(CacheKey);
+
+            using IDbConnection conn = DbConnection.GetDbConnection();
 
             var sql = @$"select * from Articles 
                          where Id = {query.Id}";
 
             Article Article;
             conn.Close();
-            
+            string CacheValue = await getStringTask;
             if (CacheValue != null)
             {
                 try

@@ -23,6 +23,7 @@ namespace Blog.Services
         private readonly IQueryDispatcher _queryDispatcher;
         private readonly ICommandDispatcher _commandDispatcher;
         private readonly IMapper _mapper;
+
         public ArticleService(ILogger<ArticleService> logger, IQueryDispatcher queryDispatcher, ICommandDispatcher commandDispatcher, IMapper mapper)
         {
             _logger = logger;
@@ -34,7 +35,7 @@ namespace Blog.Services
         public async Task AddComment(int articleId, string text, string userId)
         {
             var article = await _queryDispatcher.Execute<GetArticleById, Article>(new GetArticleById(articleId));
-            var result = await Task.Run(() => _commandDispatcher.Execute(new AddComment(text, userId, article, DateTime.Now)));
+            var result = await _commandDispatcher.Execute(new AddComment(text, userId, article, DateTime.Now));
 
             _logger.LogInformation($"User with Id {userId} add comment {result.Success}");
         }
@@ -52,7 +53,7 @@ namespace Blog.Services
             var createArticle = _mapper.Map<CreateArticle>(model);
             createArticle.User = user;
             
-            var result = await Task.Run(() => _commandDispatcher.Execute(createArticle));
+            var result = await _commandDispatcher.Execute(createArticle);
 
             _logger.LogInformation($"User with Id {user.Id} create new Article Id: {result.TotalResults}");
 

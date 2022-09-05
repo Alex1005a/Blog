@@ -45,7 +45,7 @@ namespace Blog
             });
 
             string postgresUrl = Configuration["DATABASE_URL"];
-            if (!String.IsNullOrEmpty(postgresUrl))
+            if (!string.IsNullOrEmpty(postgresUrl))
             {
                 var builder = new PostgreSqlConnectionStringBuilder(postgresUrl)
                 {
@@ -64,11 +64,11 @@ namespace Blog
             }
 
             services.AddIdentity<User, IdentityRole>(opts => {
-                opts.Password.RequiredLength = 5;   // минимальная длина
-                opts.Password.RequireNonAlphanumeric = false;   // требуются ли не алфавитно-цифровые символы
-                opts.Password.RequireLowercase = false; // требуются ли символы в нижнем регистре
-                opts.Password.RequireUppercase = false; // требуются ли символы в верхнем регистре
-                opts.Password.RequireDigit = true; // требуются ли цифры
+                opts.Password.RequiredLength = 5;   
+                opts.Password.RequireNonAlphanumeric = false;   
+                opts.Password.RequireLowercase = false;
+                opts.Password.RequireUppercase = false;
+                opts.Password.RequireDigit = true; 
                 opts.User.AllowedUserNameCharacters = null;
                 opts.User.RequireUniqueEmail = true;
             })
@@ -79,7 +79,6 @@ namespace Blog
             services.AddAutoMapper(typeof(Startup));
 
             services.AddElasticsearch();
-            services.AddRabbitMQ();
 
             services.AddScoped<IUserProfileService, UserProfileService>();
             services.AddScoped<IArticleService, ArticleService>();
@@ -180,19 +179,20 @@ namespace Blog
 
         private async Task CreateUserRoles(IServiceProvider serviceProvider)
         {
+            const string AdminRole = "God";
             var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var UserManager = serviceProvider.GetRequiredService<UserManager<User>>();
 
-            var roleCheck = await RoleManager.RoleExistsAsync("God");
+            var roleCheck = await RoleManager.RoleExistsAsync(AdminRole);
             if (roleCheck == false)
             {
-                await RoleManager.CreateAsync(new IdentityRole("God"));
+                await RoleManager.CreateAsync(new IdentityRole(AdminRole));
             }
 
-            User user = await UserManager.FindByEmailAsync("AZAZF93@GMAIL.COM");
+            User user = await UserManager.FindByEmailAsync(Passwords.AdminEmail);
             
-            if (user.PasswordHash == null & user.UserName == "Барон-Фон Копатыч")
-                await UserManager.AddToRoleAsync(user, "God");
+            if (user.PasswordHash == null & user.UserName == Passwords.AdminName)
+                await UserManager.AddToRoleAsync(user, AdminRole);
         }
     }
 }

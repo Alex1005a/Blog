@@ -22,13 +22,12 @@ namespace Blog.Features.Commands.CreateArticle
         }
         public async Task<ICommonResult> Execute(CreateArticle model)
         {          
-            var article = _mapper.Map<Article>(model);    
+            var article = _mapper.Map<Article>(model);
 
-            await Task.Run(() =>
-                model.User.AddArticle(article, db)
-            );
 
-            await client.IndexDocumentAsync(article);
+            var addArticleTask = model.User.AddArticle(article, db);
+            var indexArticleTask = client.IndexDocumentAsync(article);
+            await Task.WhenAll(addArticleTask, indexArticleTask);
 
             return new CommonResult(article.Id, "article Add in DB!!!", true); 
         }

@@ -2,9 +2,6 @@
 using Blog.Contracts.CommandInterfeces;
 using Blog.Data;
 using Blog.Entities.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Blog.Features.Commands.AddComment
@@ -23,9 +20,7 @@ namespace Blog.Features.Commands.AddComment
         {
             var comment = _mapper.Map<Comment>(model);
 
-            return await Task.Run(() =>
-                model.Article.AddComment(comment, db)
-            );
+            return await model.Article.AddComment(comment, db);
         }
     }
 }

@@ -47,7 +47,7 @@ namespace Blog.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string userId, string code)
         {
-           if(await _userProfileService.ConfirmEmail(userId, code)) return RedirectToAction("Index", "Home");
+           if(await _userProfileService.ConfirmEmail(userId, code)) return RedirectToHome();
            else return View("Error");
         }
 
@@ -69,7 +69,7 @@ namespace Blog.Controllers
                     ModelState.AddModelError(string.Empty, result);
                     return View(model);
                 } 
-                else return RedirectToAction("Index", "Home");
+                else return RedirectToHome();
             }
             return View(model);
         }
@@ -78,7 +78,6 @@ namespace Blog.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            // удаляем аутентификационные куки
             await _userProfileService.Logout();
 
             return RedirectToAction("Login", "Account");
@@ -89,7 +88,6 @@ namespace Blog.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
-            // Request a redirect to the external login provider.
             var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
             return Challenge(_userProfileService.ExternalLogin(provider, redirectUrl), provider);
         }
@@ -99,6 +97,11 @@ namespace Blog.Controllers
         public async Task<IActionResult> ExternalLoginCallback()
         {
             await _userProfileService.GetExternalLoginInfoAsync();
+            return RedirectToHome();
+        }
+
+        private IActionResult RedirectToHome()
+        {
             return RedirectToAction("Index", "Home");
         }
 

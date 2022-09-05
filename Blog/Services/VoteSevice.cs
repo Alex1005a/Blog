@@ -1,14 +1,9 @@
 ﻿using Blog.Contracts.CommandInterfeces;
 using Blog.Contracts.Queryinterfaces;
 using Blog.Contracts.Serviceinterfaces;
-using Blog.Data;
 using Blog.Entities.Models;
-using Blog.Entities.ViewModels;
 using Blog.Features.Commands.AddVote;
 using Blog.Features.Queries.GetArticleById;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Blog.Services

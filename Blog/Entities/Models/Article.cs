@@ -1,11 +1,6 @@
 ﻿using Blog.Contracts.CommandInterfeces;
 using Blog.Data;
-using Blog.Entities.Events;
-using Blog.Extensions;
 using Blog.Models;
-using Newtonsoft.Json;
-using RabbitMQ.Client;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -43,7 +38,7 @@ namespace Blog.Entities.Models
             Body = body;
         }
 
-        public async Task<ICommonResult> AddVote(Vote vote, ApplicationDbContext db, IModel client)
+        public async Task<ICommonResult> AddVote(Vote vote, ApplicationDbContext db)
         {
             var Vote = Votes.FirstOrDefault(u => u.UserId == vote.UserId);
             if (Vote == null)
@@ -52,8 +47,6 @@ namespace Blog.Entities.Models
                 _votes.Add(vote);
             }
             else Vote.UpdateStatus(vote.Status);
-
-            await Task.Run(() => client.Send(new AddVoteEvent { Vote = Vote, Time = DateTime.Now }));
 
             await db.SaveChangesAsync();
 

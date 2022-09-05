@@ -44,7 +44,6 @@ namespace Blog.Services
 
             if (user != null)
             {
-                // проверяем, подтвержден ли email
                 if (!await _userManager.IsEmailConfirmedAsync(user))
                 {
                     return "Вы не подтвердили свой email";
@@ -73,7 +72,7 @@ namespace Blog.Services
         public async Task<IdentityResult> Register(RegisterViewModel registerViewModel, IUrlHelper Url, HttpContext httpContext)
         {
             User user = new User { Email = registerViewModel.Email, UserName = registerViewModel.UserName };
-            // добавляем пользователя
+
             var result = await _userManager.CreateAsync(user, registerViewModel.Password);
 
             _logger.LogInformation("User add in db");
@@ -96,15 +95,15 @@ namespace Blog.Services
             return result;
         }
 
-        public async Task<string> GetUserId(ClaimsPrincipal user)
+        public async Task<string> GetUserId(ClaimsPrincipal userClaims)
         {
-            var user1 = await _userManager.GetUserAsync(user);
-            return await _userManager.GetUserIdAsync(user1);
+            var user = await _userManager.GetUserAsync(userClaims);
+            return await _userManager.GetUserIdAsync(user);
         }
 
-        public async Task<User> GetUserAsync(ClaimsPrincipal user)
+        public async Task<User> GetUserAsync(ClaimsPrincipal userClaims)
         {
-            return await _userManager.GetUserAsync(user);
+            return await _userManager.GetUserAsync(userClaims);
         }
 
         public async Task<bool> ConfirmEmail(string userId, string code)
@@ -134,13 +133,11 @@ namespace Blog.Services
         public async Task GetExternalLoginInfoAsync()
         {
             var info = await _signInManager.GetExternalLoginInfoAsync();
-            //await _userManager.FindByIdAsync(info.Principal.FindFirstValue(ClaimTypes.NameIdentifier));
             var user1 = await _userManager.FindByLoginAsync(info.LoginProvider, info.Principal.FindFirstValue(ClaimTypes.NameIdentifier));
             
             if (user1 != null)
             {
                 await _signInManager.SignInAsync(user1, isPersistent: false);
-                //info.Principal.FindFirstValue("image");
                 _logger.LogInformation($"User {user1.UserName} login with {info.LoginProvider}");
                 return;
             }
@@ -173,12 +170,15 @@ namespace Blog.Services
         {
             string remotePath = "/IMG/" + Guid.NewGuid().ToString() + uploadedFile.FileName;
 
-            await client.Files.UploadAsync(remotePath, body: uploadedFile.OpenReadStream());
+            var uploadTask = client.Files.UploadAsync(remotePath, body: uploadedFile.OpenReadStream());
 
             var result = await client.Sharing.CreateSharedLinkWithSettingsAsync(remotePath);
             var url = result.Url;
             string newUrl = url.Substring(0, url.Length - 4) + "raw=1";
             user.AddImgUrl(newUrl, db);
+
+            await uploadTask;
+
             return newUrl;
         }
     }
