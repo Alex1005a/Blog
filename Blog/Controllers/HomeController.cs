@@ -6,10 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Blog.Entities.Models;
 using Blog.Entities.ViewModels;
 using Blog.Contracts.Serviceinterfaces;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
-using Newtonsoft.Json;
 
 namespace Blog.Controllers
 {

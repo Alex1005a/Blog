@@ -2,8 +2,6 @@
 using Blog.Contracts.CommandInterfeces;
 using Blog.Data;
 using Blog.Entities.Models;
-using Ganss.XSS;
-using Markdig;
 using Nest;
 using System.Threading.Tasks;
 

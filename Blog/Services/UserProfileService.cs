@@ -1,5 +1,4 @@
-﻿using Blog.Contracts;
-using Blog.Contracts.Serviceinterfaces;
+﻿using Blog.Contracts.Serviceinterfaces;
 using Blog.Data;
 using Blog.Entities.ViewModels;
 using Blog.Models;
@@ -11,7 +10,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -33,7 +31,7 @@ namespace Blog.Services
             _signInManager = signInManager;
             _emailService = emailService;
             _logger = logger;
-            client =  new DropboxClient(Environment.GetEnvironmentVariable("DropboxToken") ?? Passwords.DropboxToken);
+            client =  new DropboxClient(Startup.DropboxToken);
             db = context;
         }
 

@@ -1,5 +1,4 @@
-﻿using Blog.Contracts;
-using Blog.Contracts.Queryinterfaces;
+﻿using Blog.Contracts.Queryinterfaces;
 using Blog.Entities.ViewModels;
 
 namespace Blog.Features.Queries.GetArticleById

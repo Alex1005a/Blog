@@ -8,7 +8,6 @@ using Blog.Features.Commands;
 using Blog.Features.Queries;
 using Blog.Models;
 using Blog.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -18,7 +17,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
@@ -29,6 +27,18 @@ namespace Blog
 {
     public class Startup
     {
+        public static string RedisUrl { get; private set; }
+        public static string PostgresUrl { get; private set; }
+        public static string VkClientId { get; private set; }
+        public static string VkClientSecret { get; private set; }
+        public static string GoogleClientId { get; private set; }
+        public static string GoogleClientSecret { get; private set; }
+        public static string AdminEmail { get; private set; }
+        public static string AdminName { get; private set; }
+        public static string Email { get; private set; }
+        public static string EmailPassword { get; private set; }
+        public static string DropboxToken { get; private set; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -38,13 +48,25 @@ namespace Blog
 
         public void ConfigureServices(IServiceCollection services)
         {
+            RedisUrl = Configuration["REDIS_URL"];
+            PostgresUrl = Configuration["DATABASE_URL"];
+            VkClientId = Configuration["VkClientId"];
+            VkClientSecret = Configuration["VkClientSecret"];
+            GoogleClientId = Configuration["GoogleClientId"];
+            GoogleClientSecret = Configuration["GoogleClientSecret"];
+            AdminEmail = Configuration["AdminEmail"];
+            AdminName = Configuration["AdminName"];
+            Email = Configuration["Email"];
+            EmailPassword = Configuration["EmailPassword"];
+            DropboxToken = Configuration["DropboxToken"];
+
             services.AddDistributedRedisCache(option =>
             {
-                option.Configuration = Configuration["REDIS_URL"] ?? "127.0.0.1";
+                option.Configuration = RedisUrl ?? "127.0.0.1";
                 option.InstanceName = "master";
             });
 
-            string postgresUrl = Configuration["DATABASE_URL"];
+            string postgresUrl = PostgresUrl;
             if (!string.IsNullOrEmpty(postgresUrl))
             {
                 var builder = new PostgreSqlConnectionStringBuilder(postgresUrl)
@@ -111,8 +133,8 @@ namespace Blog
                 })
                 .AddVkontakte(options =>
                 {
-                    options.ClientId = Configuration["VkClientId"] ?? Passwords.VkClientId;
-                    options.ClientSecret = Configuration["VkClientSecret"] ?? Passwords.VkClientSecret;
+                    options.ClientId = VkClientId;
+                    options.ClientSecret = VkClientSecret;
                     options.Scope.Add("email");
                     options.Events.OnCreatingTicket = (context) =>
                     {
@@ -125,8 +147,8 @@ namespace Blog
                 })
                 .AddGoogle(options =>
                 {
-                    options.ClientId = Configuration["GoogleClientId"] ?? Passwords.GoogleClientId;
-                    options.ClientSecret = Configuration["GoogleClientSecret"] ?? Passwords.GoogleClientSecret;
+                    options.ClientId = GoogleClientId;
+                    options.ClientSecret = GoogleClientSecret;
                     options.Scope.Add("profile");
                     options.Events.OnCreatingTicket = (context) =>
                     {
@@ -189,9 +211,9 @@ namespace Blog
                 await RoleManager.CreateAsync(new IdentityRole(AdminRole));
             }
 
-            User user = await UserManager.FindByEmailAsync(Passwords.AdminEmail);
+            User user = await UserManager.FindByEmailAsync(AdminEmail);
             
-            if (user.PasswordHash == null & user.UserName == Passwords.AdminName)
+            if (user.PasswordHash == null & user.UserName == AdminName)
                 await UserManager.AddToRoleAsync(user, AdminRole);
         }
     }

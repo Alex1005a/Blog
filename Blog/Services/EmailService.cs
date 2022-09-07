@@ -9,8 +9,8 @@ namespace Blog.Services
     public class EmailService
     {
         private readonly ILogger<EmailService> _logger;
-        string MyEmail = Environment.GetEnvironmentVariable("EMAIL") ?? Passwords.Email;
-        string MyPassword = Environment.GetEnvironmentVariable("PASSWORD") ?? Passwords.EmailPass;
+        string MyEmail = Startup.Email;
+        string MyPassword = Startup.EmailPassword;
         public EmailService(ILogger<EmailService> logger)
         {
             _logger = logger;

@@ -1,7 +1,6 @@
 ﻿using Blog.Contracts.Serviceinterfaces;
 using Blog.Controllers;
 using Blog.Entities.DTO;
-using Blog.Entities.Models;
 using Blog.Entities.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;

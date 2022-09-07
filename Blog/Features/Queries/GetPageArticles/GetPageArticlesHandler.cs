@@ -1,15 +1,7 @@
 ﻿using Blog.Contracts.Queryinterfaces;
-using Blog.Entities.Models;
 using Blog.Entities.ViewModels;
-using Dapper;
-using Microsoft.Extensions.Caching.Distributed;
-using Newtonsoft.Json;
 using System.Threading.Tasks;
-using Blog.Extensions;
 using Nest;
-using System.Linq;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
 using Blog.Entities.DTO;
 using System;
 
