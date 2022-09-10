@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Blog.Contracts.Queryinterfaces;
 using Blog.Entities.Models;
 using Blog.Entities.ViewModels;
 using Blog.Models;
@@ -12,10 +11,12 @@ using System.Threading.Tasks;
 using Blog.Extensions;
 using Blog.Data;
 using Microsoft.EntityFrameworkCore;
+using MediatR;
+using System.Threading;
 
 namespace Blog.Features.Queries.GetArticleById
 {
-    public class GetViewArticleByIdHandler : IQueryHandler<GetViewArticleById, ArticleViewModel>
+    public class GetViewArticleByIdHandler : IRequestHandler<GetViewArticleById, ArticleViewModel>
     {
         private readonly IMapper _mapper;
         private readonly IDbConnectionFactory context;
@@ -30,7 +31,7 @@ namespace Blog.Features.Queries.GetArticleById
             this.db = db;
         }
 
-        public async Task<ArticleViewModel> Execute(GetViewArticleById query)
+        public async Task<ArticleViewModel> Handle(GetViewArticleById query, CancellationToken cancellationToken)
         {
             string CacheKey = $"ViewArticle-{query.Id}";
             var getStringTask = _distributedCache.GetStringAsync(CacheKey);

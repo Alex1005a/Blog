@@ -8,6 +8,12 @@ using Blog.Entities.ViewModels;
 using Blog.Contracts.Serviceinterfaces;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
+using MediatR;
+using Blog.Features.Queries.GetArticleById;
+using Blog.Features.Queries.GetPageArticles;
+using Blog.Features.Commands.AddComment;
+using System;
+using Blog.Features.Commands.AddVote;
 
 namespace Blog.Controllers
 {
@@ -16,17 +22,19 @@ namespace Blog.Controllers
     {
         private readonly IUserProfileService _userProfile;
         private readonly IArticleService _articleService;
-        private readonly IVoteSevice _voteSevice;
+        private readonly IMediator _mediator;
 
-        public HomeController(IUserProfileService userProfile, IArticleService articleService, IVoteSevice voteSevice)
+        public HomeController(IUserProfileService userProfile, IArticleService articleService, IMediator mediator)
         {
             _userProfile = userProfile;
             _articleService = articleService;
-            _voteSevice = voteSevice;
+            _mediator = mediator;
         }
 
-        public async Task<IActionResult> Index(int page = 1, string searchString = null) => View(await _articleService.GetArticles(page, searchString));
-
+        public async Task<IActionResult> Index(int page = 1, string searchString = null)
+        {
+            return View(await _mediator.Send(new GetPageArticles(page, searchString)));
+        }
 
         [HttpPost]
         public async Task<JsonResult> AddFile(IFormFileCollection uploads)
@@ -47,19 +55,27 @@ namespace Blog.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Article(int id) => View(await _articleService.GetArticleById(id));
+        public async Task<IActionResult> Article(int id)
+        {
+            var articleById = new GetViewArticleById(id);
+            return View(await _mediator.Send(articleById));
+        }
 
         [HttpPost]
         public async Task<IActionResult> AddVoteForArticle(int id, VoteStatus voteStatus)
         {
-            await _voteSevice.AddVoteForArticle(id, voteStatus, await _userProfile.GetUserId(User));
+            var userId = _userProfile.GetUserId(User);
+            var article = await _mediator.Send(new GetArticleById(id));
+            await _mediator.Send(new AddVote(voteStatus, await userId, article));
             return RedirectToArticle(id);
         }
 
         [HttpPost]
         public async Task<IActionResult> AddCommentForArticle(int id, string text)
         {
-            await _articleService.AddComment(id, text, await _userProfile.GetUserId(User));
+            var userId = _userProfile.GetUserId(User);
+            var article = await _mediator.Send(new GetArticleById(id));
+            await _mediator.Send(new AddComment(text, await userId, article, DateTime.Now));
             return RedirectToArticle(id);
         }
 

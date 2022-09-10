@@ -1,10 +1,10 @@
-﻿using Blog.Contracts.CommandInterfeces;
-using Blog.Entities.Models;
+﻿using Blog.Entities.Models;
+using MediatR;
 using System;
 
 namespace Blog.Features.Commands.AddComment
 {
-    public class AddComment : ICommand
+    public class AddComment : IRequest
     {
         public string Text { get; set; }
         public string UserId { get; set; }

@@ -1,9 +1,9 @@
-﻿using Blog.Contracts.CommandInterfeces;
-using Blog.Entities.Models;
+﻿using Blog.Entities.Models;
+using MediatR;
 
 namespace Blog.Features.Commands.AddVote
 {
-    public class AddVote : ICommand
+    public class AddVote : IRequest
     {
         public VoteStatus VoteStatus { get; set; }
         public string UserId { get; set; }

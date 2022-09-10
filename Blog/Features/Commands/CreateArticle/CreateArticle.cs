@@ -1,9 +1,9 @@
-﻿using Blog.Contracts.CommandInterfeces;
-using Blog.Models;
+﻿using Blog.Models;
+using MediatR;
 
 namespace Blog.Features.Commands.CreateArticle
 {
-    public class CreateArticle : ICommand
+    public class CreateArticle : IRequest<int>
     {
         public string Title { get; set; }
         public string Body { get; set; }

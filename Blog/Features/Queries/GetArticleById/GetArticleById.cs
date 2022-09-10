@@ -1,9 +1,9 @@
-﻿using Blog.Contracts.Queryinterfaces;
-using Blog.Entities.Models;
+﻿using Blog.Entities.Models;
+using MediatR;
 
 namespace Blog.Features.Queries.GetArticleById
 {
-    public class GetArticleById : IQuery<Article>
+    public class GetArticleById : IRequest<Article>
     {
         public int Id { get; set; }
         public GetArticleById(int id)

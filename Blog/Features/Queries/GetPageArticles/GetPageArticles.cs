@@ -1,9 +1,9 @@
-﻿using Blog.Contracts.Queryinterfaces;
-using Blog.Entities.ViewModels;
+﻿using Blog.Entities.ViewModels;
+using MediatR;
 
 namespace Blog.Features.Queries.GetPageArticles
 {
-    public class GetPageArticles : IQuery<IndexViewModel>
+    public class GetPageArticles : IRequest<IndexViewModel>
     {
         public int Page { get; set; }
         public string SearchString { get; set; }

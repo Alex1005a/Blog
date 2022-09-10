@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
-using Blog.Contracts.CommandInterfeces;
 using Blog.Data;
 using Blog.Entities.Models;
+using MediatR;
 using Nest;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Blog.Features.Commands.CreateArticle
 {
-    public class CreateArticleHandler : ICommandHandler<CreateArticle>
+    public class CreateArticleHandler : IRequestHandler<CreateArticle, int>
     {
         private readonly ApplicationDbContext db;
         private readonly IMapper _mapper;
@@ -18,16 +19,17 @@ namespace Blog.Features.Commands.CreateArticle
             _mapper = mapper;
             client = _client;
         }
-        public async Task<ICommonResult> Execute(CreateArticle model)
-        {          
+        public async Task<int> Handle(CreateArticle model, CancellationToken cancellationToken)
+        {
             var article = _mapper.Map<Article>(model);
 
-
-            var addArticleTask = model.User.AddArticle(article, db);
+            model.User.AddArticle(article);
+            var addArticleTask = db.SaveChangesAsync();
             var indexArticleTask = client.IndexDocumentAsync(article);
+
             await Task.WhenAll(addArticleTask, indexArticleTask);
 
-            return new CommonResult(article.Id, "article Add in DB!!!", true); 
+            return article.Id;
         }
     }
 }

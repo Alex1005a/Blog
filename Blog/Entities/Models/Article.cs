@@ -1,10 +1,7 @@
-﻿using Blog.Contracts.CommandInterfeces;
-using Blog.Data;
-using Blog.Models;
+﻿using Blog.Models;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Blog.Entities.Models
 {
@@ -38,7 +35,7 @@ namespace Blog.Entities.Models
             Body = body;
         }
 
-        public async Task<ICommonResult> AddVote(Vote vote, ApplicationDbContext db)
+        public void AddVote(Vote vote)
         {
             var Vote = Votes.FirstOrDefault(u => u.UserId == vote.UserId);
             if (Vote == null)
@@ -47,18 +44,10 @@ namespace Blog.Entities.Models
                 _votes.Add(vote);
             }
             else Vote.UpdateStatus(vote.Status);
-
-            await db.SaveChangesAsync();
-
-            return new CommonResult(Vote.Id, "Vote add", true);
         }
-        public async Task<ICommonResult> AddComment(Comment comment, ApplicationDbContext db)
+        public void AddComment(Comment comment)
         {
             _comments.Add(comment);
-
-            await db.SaveChangesAsync();
-
-            return new CommonResult(comment.Id, "comment add", true);
         }
     }
 }

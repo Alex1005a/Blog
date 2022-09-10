@@ -1,11 +1,12 @@
-﻿using Blog.Contracts.CommandInterfeces;
-using Blog.Data;
+﻿using Blog.Data;
 using Blog.Entities.Models;
+using MediatR;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Blog.Features.Commands.AddVote
 {
-    public class AddVoteHandler : ICommandHandler<AddVote>
+    public class AddVoteHandler : IRequestHandler<AddVote, Unit>
     {
         private readonly ApplicationDbContext db;
 
@@ -14,7 +15,7 @@ namespace Blog.Features.Commands.AddVote
             db = context;
         }
 
-        public async Task<ICommonResult> Execute(AddVote model)
+        public async Task<Unit> Handle(AddVote model, CancellationToken cancellationToken)
         {
             var vote = new Vote
             (
@@ -22,8 +23,9 @@ namespace Blog.Features.Commands.AddVote
                 model.UserId,
                 model.Article.Id
             );
-
-            return await model.Article.AddVote(vote, db);          
+            model.Article.AddVote(vote);
+            await db.SaveChangesAsync();
+            return Unit.Value;          
         }
     }
 }

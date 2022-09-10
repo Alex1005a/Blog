@@ -1,5 +1,4 @@
-﻿using Blog.Contracts.Queryinterfaces;
-using Blog.Data;
+﻿using Blog.Data;
 using Blog.Entities.Models;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +10,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System;
+using MediatR;
+using System.Threading;
 
 namespace Blog.Features.Queries.GetArticleById
 {
-    public class GetArticleByIdHandler : IQueryHandler<GetArticleById, Article>
+    public class GetArticleByIdHandler : IRequestHandler<GetArticleById, Article>
     {
         private readonly ApplicationDbContext db;
         private readonly IDbConnectionFactory DbConnection;
@@ -28,7 +29,7 @@ namespace Blog.Features.Queries.GetArticleById
             _distributedCache = distributedCache;
             log = _log;
         }
-        public async Task<Article> Execute(GetArticleById query)
+        public async Task<Article> Handle(GetArticleById query, CancellationToken cancellationToken)
         {
             string CacheKey = $"Article-{query.Id}";
             var getStringTask = _distributedCache.GetStringAsync(CacheKey);

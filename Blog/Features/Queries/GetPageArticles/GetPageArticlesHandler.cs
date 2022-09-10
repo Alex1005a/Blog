@@ -1,13 +1,14 @@
-﻿using Blog.Contracts.Queryinterfaces;
-using Blog.Entities.ViewModels;
+﻿using Blog.Entities.ViewModels;
 using System.Threading.Tasks;
 using Nest;
 using Blog.Entities.DTO;
 using System;
+using System.Threading;
+using MediatR;
 
 namespace Blog.Features.Queries.GetPageArticles
 {
-    public class GetPageArticlesHandler : IQueryHandler<GetPageArticles, IndexViewModel>
+    public class GetPageArticlesHandler : IRequestHandler<GetPageArticles, IndexViewModel>
     {
         private readonly ElasticClient client;
 
@@ -16,7 +17,7 @@ namespace Blog.Features.Queries.GetPageArticles
             client = _client;
         }
 
-        public async Task<IndexViewModel> Execute(GetPageArticles query)
+        public async Task<IndexViewModel> Handle(GetPageArticles query, CancellationToken cancellationToken)
         {
             Func<QueryContainerDescriptor<ArticleDTO>, QueryContainer> searchQuery =
                 q => q.Match(m => m
