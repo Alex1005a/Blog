@@ -1,6 +1,5 @@
 ﻿using Blog.Contracts.Serviceinterfaces;
-using Blog.Entities.ViewModels;
-using Blog.ViewModels;
+using Blog.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;

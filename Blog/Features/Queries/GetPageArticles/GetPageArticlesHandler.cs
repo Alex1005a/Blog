@@ -1,49 +1,39 @@
-﻿using Blog.Entities.ViewModels;
+﻿using Blog.Models.ViewModels;
 using System.Threading.Tasks;
-using Nest;
-using Blog.Entities.DTO;
-using System;
+using Blog.Models.DTO;
 using System.Threading;
 using MediatR;
+using Blog.Domain;
+using System.Linq;
+using AutoMapper;
 
 namespace Blog.Features.Queries.GetPageArticles
 {
     public class GetPageArticlesHandler : IRequestHandler<GetPageArticles, IndexViewModel>
     {
-        private readonly ElasticClient client;
+        private const int PageSize = 3;
 
-        public GetPageArticlesHandler(ElasticClient _client)
+        private readonly IMapper _mapper;
+        private readonly IArticleRepository _articleRepository;
+
+        public GetPageArticlesHandler(IMapper mapper, IArticleRepository articleRepository)
         {
-            client = _client;
+            _mapper = mapper;
+            _articleRepository = articleRepository;
         }
 
         public async Task<IndexViewModel> Handle(GetPageArticles query, CancellationToken cancellationToken)
         {
-            Func<QueryContainerDescriptor<ArticleDTO>, QueryContainer> searchQuery =
-                q => q.Match(m => m
-                               .Field(f => f.Title)
-                               .Query(query.SearchString)
-                                .Fuzziness(Fuzziness.EditDistance(3))
-                             );
+            var articles = await _articleRepository.SearchByTitle(PageSize, query.Page, query.SearchString);
+            var numberOfArticles = await _articleRepository.CountByTitle(query.SearchString);
+           
 
-            int pageSize = 3;
-
-            var resultTask = client.SearchAsync<ArticleDTO>(descriptor => descriptor
-                                .From((query.Page - 1) * pageSize)
-                                .Size(pageSize)
-                                .Query(searchQuery)
-                             );
-
-            var countTask = client.CountAsync<ArticleDTO>(descriptor => descriptor
-                                .Query(searchQuery)
-                              );
-
-            PageViewModel pageViewModel = new PageViewModel((int)(await countTask).Count, query.Page, pageSize);
+            PageViewModel pageViewModel = new(numberOfArticles, query.Page, PageSize);
 
             return new IndexViewModel
             {
                 PageViewModel = pageViewModel,
-                Articles = (await resultTask).Documents,
+                Articles = articles.Select(_mapper.Map<ArticleDTO>),
                 SearchString = query.SearchString
             };
         }

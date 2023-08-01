@@ -1,4 +1,4 @@
-﻿using Blog.Entities.Models;
+﻿using Blog.Domain;
 using MediatR;
 
 namespace Blog.Features.Commands.AddVote
@@ -7,13 +7,13 @@ namespace Blog.Features.Commands.AddVote
     {
         public VoteStatus VoteStatus { get; set; }
         public string UserId { get; set; }
-        public Article Article { get; set; }
+        public int ArticleId { get; set; }
 
-        public AddVote(VoteStatus VoteStatus, string UserId, Article Article)
+        public AddVote(VoteStatus voteStatus, string userId, int articleId)
         {
-            this.VoteStatus = VoteStatus;
-            this.UserId = UserId;
-            this.Article = Article;
+            VoteStatus = voteStatus;
+            UserId = userId;
+            ArticleId = articleId;
         }
     }
 }

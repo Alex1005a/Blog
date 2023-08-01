@@ -1,15 +1,14 @@
-﻿@model Blog.Entities.ViewModels.IndexViewModel
+﻿@model Blog.Models.ViewModels.IndexViewModel
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<User> UserManager
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Домашняя страница";
     string imgUrl = (await UserManager.GetUserAsync(User)).ImageUrl;
     string defaultImg = "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRVNjvUQD072GrkS1SUlQN-aKG_rkAit5-t6A&usqp=CAU)";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Добро пожаловать!</h1>
 </div>
 
 <img id="avatar" src="@Url.Content(imgUrl ?? defaultImg)" alt="Аватар" />

@@ -1,5 +1,4 @@
-﻿using Blog.Models;
-using MediatR;
+﻿using MediatR;
 
 namespace Blog.Features.Commands.CreateArticle
 {
@@ -7,6 +6,6 @@ namespace Blog.Features.Commands.CreateArticle
     {
         public string Title { get; set; }
         public string Body { get; set; }
-        public User User { get; set; }
+        public string UserId { get; set; }
     }
 }

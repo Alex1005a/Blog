@@ -1,4 +1,4 @@
-﻿using Blog.Entities.ViewModels;
+﻿using Blog.Models.ViewModels;
 using MediatR;
 
 namespace Blog.Features.Queries.GetArticleById

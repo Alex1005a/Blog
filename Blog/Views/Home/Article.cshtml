@@ -1,28 +1,28 @@
-﻿@model Blog.Entities.ViewModels.ArticleViewModel
+﻿@model Blog.Models.ViewModels.ArticleViewModel
 
 <h1>Статья</h1>
 
 <a>Автор: @Model.User.UserName</a>
 <h3>@Model.Title</h3>
-<!-- <a>@Model.Body</a> -->
+<a>@Model.Body</a>
 <a>@Html.Raw(Model.Body)</a>
 
-<div id="ass">@await Html.PartialAsync("GetAssessment", Model.Votes)</div>
+<div><h4>@Model.Rating</h4></div>
 
-<form id="plus" method="post" asp-controller="Home" asp-action="AddVoteForArticle" asp-route-id="@Model.Id" asp-route-voteStatus="@Blog.Entities.Models.VoteStatus.Plus">
+<form id="plus" method="post" asp-controller="Home" asp-action="AddVoteForArticle" asp-route-id="@Model.Id" asp-route-voteStatus="@Blog.Domain.VoteStatus.Upvote">
     <div>
         <input type="submit" value="Плюс" />
     </div>
 </form>
-<form id="minus" method="post" asp-controller="Home" asp-action="AddVoteForArticle" asp-route-id="@Model.Id" asp-route-voteStatus="@Blog.Entities.Models.VoteStatus.Minus">
+<form id="minus" method="post" asp-controller="Home" asp-action="AddVoteForArticle" asp-route-id="@Model.Id" asp-route-voteStatus="@Blog.Domain.VoteStatus.Downvote">
     <div>
         <input type="submit" value="Минус" />
     </div>
 </form>
-@foreach (var a in Model.Comments)
+@foreach (var comment in Model.Comments)
 {
-    <a>@a.User.UserName</a>
-    <a>@a.Text</a>
+    <!--<a>comment.User.UserName</a>-->
+    <a>@comment.Text</a>
 }
 <form method="post" asp-controller="Home" asp-action="AddCommentForArticle" asp-route-id="@Model.Id">
     <div>

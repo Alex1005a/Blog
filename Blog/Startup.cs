@@ -1,8 +1,8 @@
 using AutoMapper;
 using Blog.Contracts.Serviceinterfaces;
-using Blog.Data;
-using Blog.Extensions;
-using Blog.Models;
+using Blog.Domain;
+using Blog.Infrastructure;
+using Blog.Infrastructure.Extensions;
 using Blog.Services;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -95,13 +95,16 @@ namespace Blog
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.AddSingleton<IDbConnectionFactory>(x => new DbConnectionFactory(Configuration.GetConnectionString("DefaultConnection")));
             services.AddAutoMapper(typeof(Startup));
 
             services.AddElasticsearch();
 
-            services.AddScoped<IUserProfileService, UserProfileService>();
-            services.AddScoped<IArticleService, ArticleService>();
+            services.AddSingleton<IArticleRepository, ArticleRepository>();
+            services.AddSingleton<ICommentRepository, CommentRepository>();
+            services.AddSingleton<IUserRepository, UserRepository>();
+            services.AddSingleton<IVoteRepository, VoteRepository>();
+
+            services.AddSingleton<IUserProfileService, UserProfileService>();
             services.AddSingleton<EmailService>();
 
             services.AddAuthentication()

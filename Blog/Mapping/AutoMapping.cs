@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Blog.Entities.Models;
-using Blog.Entities.ViewModels;
+using Blog.Domain;
+using Blog.Models.ViewModels;
 using Blog.Features.Commands.AddComment;
 using Blog.Features.Commands.CreateArticle;
 

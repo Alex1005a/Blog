@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Blog.Data;
-using Blog.Entities.Models;
+using Blog.Domain;
+using Ganss.XSS;
+using Markdig;
 using MediatR;
-using Nest;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,25 +10,26 @@ namespace Blog.Features.Commands.CreateArticle
 {
     public class CreateArticleHandler : IRequestHandler<CreateArticle, int>
     {
-        private readonly ApplicationDbContext db;
+        private readonly IArticleRepository _articleRepository;
         private readonly IMapper _mapper;
-        private readonly ElasticClient client;
-        public CreateArticleHandler(ApplicationDbContext context, IMapper mapper, ElasticClient _client)
+
+        public CreateArticleHandler(IArticleRepository articleRepository, IMapper mapper)
         {
-            db = context;
+            _articleRepository = articleRepository;
             _mapper = mapper;
-            client = _client;
         }
-        public async Task<int> Handle(CreateArticle model, CancellationToken cancellationToken)
+
+        public async Task<int> Handle(CreateArticle request, CancellationToken cancellationToken)
         {
-            var article = _mapper.Map<Article>(model);
+            var sanitizer = new HtmlSanitizer();
+            sanitizer.AllowedAttributes.Remove("form");
 
-            model.User.AddArticle(article);
-            var addArticleTask = db.SaveChangesAsync();
-            var indexArticleTask = client.IndexDocumentAsync(article);
-
-            await Task.WhenAll(addArticleTask, indexArticleTask);
-
+            string html = Markdown.ToHtml(request.Body, new MarkdownPipelineBuilder()
+                                                          .UseAdvancedExtensions()
+                                                          .Build());
+            request.Body = sanitizer.Sanitize(html);
+            var article = _mapper.Map<Article>(request);
+            await _articleRepository.Add(article);
             return article.Id;
         }
     }

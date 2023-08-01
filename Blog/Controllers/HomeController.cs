@@ -1,10 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Blog.Models;
 using Microsoft.AspNetCore.Authorization;
-using Blog.Entities.Models;
-using Blog.Entities.ViewModels;
+using Blog.Models.ViewModels;
 using Blog.Contracts.Serviceinterfaces;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
@@ -14,6 +12,10 @@ using Blog.Features.Queries.GetPageArticles;
 using Blog.Features.Commands.AddComment;
 using System;
 using Blog.Features.Commands.AddVote;
+using Blog.Domain;
+using Blog.Features.Commands.CreateArticle;
+using AutoMapper;
+using Blog.Models;
 
 namespace Blog.Controllers
 {
@@ -21,14 +23,17 @@ namespace Blog.Controllers
     public class HomeController : Controller
     {
         private readonly IUserProfileService _userProfile;
-        private readonly IArticleService _articleService;
         private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
 
-        public HomeController(IUserProfileService userProfile, IArticleService articleService, IMediator mediator)
+        public HomeController(
+            IUserProfileService userProfile, 
+            IMediator mediator,
+            IMapper mapper)
         {
             _userProfile = userProfile;
-            _articleService = articleService;
             _mediator = mediator;
+            _mapper = mapper;
         }
 
         public async Task<IActionResult> Index(int page = 1, string searchString = null)
@@ -50,7 +55,9 @@ namespace Blog.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateArticle(CreateArticleViewModel model)
         {
-            int id = await _articleService.Create(model, await _userProfile.GetUserAsync(User));
+            var request = _mapper.Map<CreateArticle>(model);
+            request.UserId = await _userProfile.GetUserId(User);
+            int id = await _mediator.Send(request);
             return RedirectToArticle(id);
         }
 
@@ -64,18 +71,16 @@ namespace Blog.Controllers
         [HttpPost]
         public async Task<IActionResult> AddVoteForArticle(int id, VoteStatus voteStatus)
         {
-            var userId = _userProfile.GetUserId(User);
-            var article = await _mediator.Send(new GetArticleById(id));
-            await _mediator.Send(new AddVote(voteStatus, await userId, article));
+            var userId = await _userProfile.GetUserId(User);
+            await _mediator.Send(new AddVote(voteStatus, userId, id));
             return RedirectToArticle(id);
         }
 
         [HttpPost]
         public async Task<IActionResult> AddCommentForArticle(int id, string text)
         {
-            var userId = _userProfile.GetUserId(User);
-            var article = await _mediator.Send(new GetArticleById(id));
-            await _mediator.Send(new AddComment(text, await userId, article, DateTime.Now));
+            var userId = await _userProfile.GetUserId(User);
+            await _mediator.Send(new AddComment(text, userId, DateTime.Now));
             return RedirectToArticle(id);
         }
 
